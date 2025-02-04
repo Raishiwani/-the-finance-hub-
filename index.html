@@ -1,14 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Management</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-
 <header>
     <h1>Personal Finance Management</h1>
     <p>Track your spending, income, and savings.</p>
@@ -16,19 +5,19 @@
 
 <div class="dashboard-container">
     <div id="summary">
-        <div><strong>Total Income: ₹</strong><span id="totalIncome">0</span></div>
-        <div><strong>Total Expenses: ₹</strong><span id="totalExpense">0</span></div>
-        <div><strong>Balance Left: ₹</strong><span id="balanceLeft">0</span></div>
+        <div>Total Income: 💰 <span id="totalIncome">0</span></div>
+        <div>Total Expenses: 💸 <span id="totalExpense">0</span></div>
+        <div>Balance Left: 💵 <span id="balanceLeft">0</span></div>
     </div>
 
-    <h2>Transaction List</h2>
+    <h2>Transaction List 📋</h2>
     <input type="text" id="search" placeholder="Search transactions...">
     <select id="filterCategory">
         <option value="all">All Categories</option>
-        <option value="food">Food</option>
-        <option value="rent">Rent</option>
-        <option value="salary">Salary</option>
-        <option value="others">Others</option>
+        <option value="food">Food 🍔</option>
+        <option value="rent">Rent 🏠</option>
+        <option value="salary">Salary 💼</option>
+        <option value="others">Others 🔄</option>
     </select>
     <ul id="transactions"></ul>
 
@@ -36,50 +25,41 @@
         <input type="text" id="description" required placeholder="Description">
         <input type="number" id="amount" required placeholder="Amount">
         <select id="category">
-            <option value="food">Food</option>
-            <option value="rent">Rent</option>
-            <option value="salary">Salary</option>
-            <option value="others">Others</option>
+            <option value="food">Food 🍔</option>
+            <option value="rent">Rent 🏠</option>
+            <option value="salary">Salary 💼</option>
+            <option value="others">Others 🔄</option>
         </select>
         <select id="type">
-            <option value="income">Income</option>
-            <option value="expense">Expense</option>
+            <option value="income">Income 💰</option>
+            <option value="expense">Expense 💸</option>
         </select>
         <button type="submit">Add Transaction</button>
     </form>
     
-    <label for="timePeriod">Select Time Period:</label>
+    <label for="timePeriod">Select Time Period 📅:</label>
     <select id="timePeriod">
-        <option value="daily">Daily</option>
-        <option value="weekly">Weekly</option>
-        <option value="monthly">Monthly</option>
+        <option value="daily">Daily 🗓️</option>
+        <option value="weekly">Weekly 📆</option>
+        <option value="monthly">Monthly 📅</option>
     </select>
+</div>
 
-    <!-- Milestone Tracker -->
-    <h3>Milestone Tracker (Goal Setting)</h3>
-    <label for="goalCategory">Goal Category:</label>
-    <input type="text" id="goalCategory" placeholder="e.g., Savings Goal">
-    <label for="goalAmount">Goal Amount:</label>
-    <input type="number" id="goalAmount" placeholder="₹ Goal Amount">
-    <label for="goalDeadline">Goal Deadline:</label>
-    <input type="date" id="goalDeadline">
-    <button id="setGoalButton">Set Goal</button>
-    <div id="goalProgress" style="margin-top: 20px; display: none;">
-        <p>Goal: <strong id="goalDisplay">N/A</strong></p>
-        <p>Deadline: <strong id="goalDeadlineDisplay">N/A</strong></p>
-        <progress id="goalProgressBar" value="0" max="100"></progress>
-        <p><span id="goalProgressText">0%</span> Completed</p>
+<div id="milestone-container">
+    <h3>Set Your Milestone 🎯</h3>
+    <div>
+        <label for="milestone-description">Milestone Description:</label>
+        <input type="text" id="milestone-description" placeholder="E.g., Save for vacation">
+    </div>
+    <div>
+        <label for="milestone-amount">Target Amount: ₹</label>
+        <input type="number" id="milestone-amount">
+    </div>
+    <div>
+        <button id="setMilestone">Set Milestone</button>
     </div>
 </div>
 
 <div id="chart-container">
     <canvas id="transactionChart"></canvas>
-    <canvas id="incomeExpenseChart"></canvas>
-    <canvas id="expenseCategoryChart"></canvas>
 </div>
-
-<button id="exportCsvBtn">Export Transactions to CSV</button>
-
-<script src="script.js"></script>
-</body>
-</html>
