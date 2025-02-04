@@ -16,26 +16,26 @@ function addTransaction(event) {
         return;
     }
 
-    // Creating the new transaction object
     const transaction = { description, amount, type, category };
     transactions.push(transaction);
-    
+
     // Saving to localStorage
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
     console.log("Transaction Added:", transaction); // Debugging log
 
-    // Call renderTransactions to display updated list
-    renderTransactions();
-    
-    // Reset form inputs
-    document.getElementById("transaction-form").reset();
+    renderTransactions(); // Re-render transactions after adding one
+    document.getElementById("transaction-form").reset(); // Reset form
 }
 
 // Render Transactions
 function renderTransactions(filteredTransactions = transactions) {
     const transactionList = document.getElementById('transactions');
-    transactionList.innerHTML = "";
+    transactionList.innerHTML = ""; // Clear current list
+
+    if (!filteredTransactions || filteredTransactions.length === 0) {
+        console.log("No transactions to display."); // Debugging log
+    }
 
     filteredTransactions.forEach((transaction, index) => {
         const li = document.createElement('li');
@@ -54,7 +54,7 @@ function renderTransactions(filteredTransactions = transactions) {
 function deleteTransaction(index) {
     transactions.splice(index, 1);
     localStorage.setItem("transactions", JSON.stringify(transactions));
-    renderTransactions();
+    renderTransactions(); // Re-render transactions after deletion
 }
 
 // Calculate Summary
@@ -73,7 +73,7 @@ function renderChart() {
     const ctx = document.getElementById("transactionChart").getContext("2d");
 
     if (transactionChart !== null) {
-        transactionChart.destroy();
+        transactionChart.destroy(); // Destroy existing chart if any
     }
 
     const labels = transactions.map(t => t.description);
@@ -104,66 +104,8 @@ function renderChart() {
     });
 }
 
-// Set Goal
-function setGoal() {
-    const goalCategory = document.getElementById("goalCategory").value.trim();
-    const goalAmount = parseFloat(document.getElementById("goalAmount").value);
-    const goalDeadline = document.getElementById("goalDeadline").value;
-
-    if (goalCategory === "" || isNaN(goalAmount) || !goalDeadline) {
-        alert("Please fill all goal details.");
-        return;
-    }
-
-    goal = { goalCategory, goalAmount, goalDeadline, progress: 0 };
-    localStorage.setItem("goal", JSON.stringify(goal));
-
-    renderGoalProgress();
-}
-
-// Render Goal Progress
-function renderGoalProgress() {
-    const progress = goal ? (goal.progress / goal.goalAmount) * 100 : 0;
-
-    document.getElementById("goalProgress").style.display = goal ? "block" : "none";
-    document.getElementById("goalDisplay").innerText = goal ? goal.goalCategory : "N/A";
-    document.getElementById("goalDeadlineDisplay").innerText = goal ? goal.goalDeadline : "N/A";
-    document.getElementById("goalProgressBar").value = progress;
-    document.getElementById("goalProgressText").innerText = `${Math.round(progress)}%`;
-}
-
-// Export Transactions to CSV
-function exportToCSV() {
-    const csvData = transactions.map(t => `${t.description},${t.amount},${t.type},${t.category}`).join("\n");
-    const csvContent = `Description,Amount,Type,Category\n${csvData}`;
-    const blob = new Blob([csvContent], { type: "text/csv" });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
-    link.download = "transactions.csv";
-    link.click();
-}
-
-// Search Transactions
-function searchTransactions() {
-    const searchValue = document.getElementById("search").value.toLowerCase();
-    const filterCategory = document.getElementById("filterCategory").value;
-
-    const filteredTransactions = transactions.filter(transaction => {
-        const descriptionMatch = transaction.description.toLowerCase().includes(searchValue);
-        const categoryMatch = filterCategory === "all" || transaction.category === filterCategory;
-        return descriptionMatch && categoryMatch;
-    });
-
-    renderTransactions(filteredTransactions);
-}
-
 // Event Listeners
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
-document.getElementById("setGoalButton").addEventListener("click", setGoal);
-document.getElementById("exportCsvBtn").addEventListener("click", exportToCSV);
-document.getElementById("search").addEventListener("input", searchTransactions);
-document.getElementById("filterCategory").addEventListener("change", searchTransactions);
 
 // Initial render
 renderTransactions();
-renderGoalProgress();
