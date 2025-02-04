@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+    <h1>💰 Personal Finance Management</h1>
+    <p>Track your spending, income, and savings efficiently.</p>
+</header>
+
+<div class="dashboard-container">
+    
+    <!-- Summary Section -->
+    <div id="summary">
+        <div><strong>Total Income:</strong> ₹<span id="totalIncome">0</span></div>
+        <div><strong>Total Expenses:</strong> ₹<span id="totalExpense">0</span></div>
+        <div><strong>Balance Left:</strong> ₹<span id="balanceLeft">0</span></div>
+        <div><strong>Income-to-Expense Ratio:</strong> <span id="ratio">0%</span></div>
+        <div><strong>Top Expense Category:</strong> <span id="topExpenseCategory">None</span></div>
+        <div><strong>Top Income Category:</strong> <span id="topIncomeCategory">None</span></div>
+    </div>
+
+    <!-- Milestone Tracker -->
+    <h3>🎯 Milestone Tracker</h3>
+    <form id="milestone-form">
+        <input type="text" id="milestone-description" placeholder="Goal description" required>
+        <input type="number" id="milestone-amount" placeholder="Goal amount" required>
+        <button type="submit">Set Goal</button>
+    </form>
+    <ul id="milestones-list"></ul>
+
+    <!-- Transactions -->
+    <h2>📋 Transaction List</h2>
+    <input type="text" id="search" placeholder="Search transactions...">
+    <select id="filterCategory">
+        <option value="all">All Categories</option>
+        <option value="food">Food</option>
+        <option value="rent">Rent</option>
+        <option value="salary">Salary</option>
+        <option value="others">Others</option>
+    </select>
+    <ul id="transactions"></ul>
+
+    <!-- Add Transaction Form -->
+    <form id="transaction-form">
+        <input type="text" id="description" required placeholder="Description">
+        <input type="number" id="amount" required placeholder="Amount">
+        <select id="category">
+            <option value="food">Food</option>
+            <option value="rent">Rent</option>
+            <option value="salary">Salary</option>
+            <option value="others">Others</option>
+        </select>
+        <select id="type">
+            <option value="income">Income</option>
+            <option value="expense">Expense</option>
+        </select>
+        <button type="submit">Add Transaction</button>
+    </form>
+
+    <label for="timePeriod">Select Time Period:</label>
+    <select id="timePeriod">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+    </select>
+
+</div>
+
+<!-- Line Chart -->
+<div id="chart-container">
+    <canvas id="transactionChart"></canvas>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>

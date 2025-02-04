@@ -1,0 +1,128 @@
+/* General Styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #0073e6;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+/* Section Headers */
+h2, h3 {
+    color: #0073e6;
+    text-transform: uppercase;
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-top: 20px;
+}
+
+.dashboard-container {
+    width: 90%;
+    margin: 20px auto;
+    padding: 20px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Summary Box */
+#summary {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    background: #eef6ff;
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+#summary div {
+    font-size: 1.1em;
+    padding: 10px;
+}
+
+/* Highlight Important Values */
+#totalIncome {
+    color: green;
+    font-weight: bold;
+}
+
+#totalExpense {
+    color: red;
+    font-weight: bold;
+}
+
+#balanceLeft {
+    color: purple;
+    font-weight: bold;
+}
+
+/* Buttons */
+button {
+    background: #0073e6;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    margin: 5px 0;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #005bb5;
+}
+
+/* Transaction List */
+.transaction-item {
+    background: #f8f8f8;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.transaction-item button {
+    background: red;
+    margin-left: 10px;
+}
+
+/* Milestone Tracker */
+#milestones-list {
+    background: #fff3cd;
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.progress-bar-container {
+    background: #ddd;
+    border-radius: 5px;
+    width: 100%;
+    margin-top: 5px;
+    position: relative;
+}
+
+.progress-bar {
+    background: #28a745;
+    height: 20px;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    transition: width 0.5s ease-in-out;
+}
+
+/* Chart Section */
+#chart-container {
+    margin-top: 20px;
+    text-align: center;
+}
