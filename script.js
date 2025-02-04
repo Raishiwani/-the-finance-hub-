@@ -33,18 +33,12 @@ function renderTransactions(filteredTransactions = transactions) {
     const transactionList = document.getElementById('transactions');
     transactionList.innerHTML = ""; // Clear current list
 
-    if (!filteredTransactions || filteredTransactions.length === 0) {
-        console.log("No transactions to display."); // Debugging log
-    }
-
     filteredTransactions.forEach((transaction, index) => {
         const li = document.createElement('li');
         li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
         <button onclick="deleteTransaction(${index})">Delete</button>`;
         transactionList.appendChild(li);
     });
-
-    console.log("Transactions Rendered:", filteredTransactions); // Debugging log
 
     calculateSummary();
     renderChart();
@@ -104,8 +98,46 @@ function renderChart() {
     });
 }
 
-// Event Listeners
-document.getElementById("transaction-form").addEventListener("submit", addTransaction);
+// Set Goal
+function setGoal() {
+    const milestoneDescription = document.getElementById("milestone-description").value.trim();
+    const milestoneAmount = parseFloat(document.getElementById("milestone-amount").value);
 
-// Initial render
+    if (milestoneDescription === "" || isNaN(milestoneAmount)) {
+        alert("Please enter valid milestone description and amount.");
+        return;
+    }
+
+    goal = { description: milestoneDescription, targetAmount: milestoneAmount };
+    localStorage.setItem("goal", JSON.stringify(goal));
+
+    renderGoalProgress();
+}
+
+// Render Goal Progress
+function renderGoalProgress() {
+    const goalContainer = document.getElementById("milestone-container");
+    const goalDescription = document.getElementById("milestone-description");
+    const goalAmount = document.getElementById("milestone-amount");
+
+    goalContainer.innerHTML = `Goal Set: ${goal.description}, Target: ₹${goal.targetAmount}`;
+}
+
+// Export Transactions to CSV
+function exportToCSV() {
+    const csvData = transactions.map(t => `${t.description},${t.amount},${t.type},${t.category}`).join("\n");
+    const csvContent = `Description,Amount,Type,Category\n${csvData}`;
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "transactions.csv";
+    link.click();
+}
+
+// Add Event Listeners for Buttons
+document.getElementById("transaction-form").addEventListener("submit", addTransaction);
+document.getElementById("setGoalButton").addEventListener("click", setGoal);
+document.getElementById("exportCsvBtn").addEventListener("click", exportToCSV);
+
+// Initial Render
 renderTransactions();
