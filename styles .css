@@ -1,128 +1,90 @@
-/* General Styling */
 body {
+    background-color: white;
+    color: black;
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    color: #333;
-    margin: 0;
-    padding: 0;
+    transition: 0.3s;
 }
 
 header {
-    background-color: #0073e6;
-    color: white;
-    padding: 20px;
     text-align: center;
-    font-size: 1.5em;
-    font-weight: bold;
-}
-
-/* Section Headers */
-h2, h3 {
-    color: #0073e6;
-    text-transform: uppercase;
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-top: 20px;
+    padding: 20px;
+    background-color: #008CBA;
+    color: white;
 }
 
 .dashboard-container {
-    width: 90%;
-    margin: 20px auto;
+    width: 80%;
+    margin: auto;
     padding: 20px;
-    background: white;
+    background-color: #f5f5f5;
     border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Summary Box */
 #summary {
     display: flex;
-    flex-wrap: wrap;
     justify-content: space-between;
-    background: #eef6ff;
-    padding: 15px;
-    border-radius: 10px;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-
-#summary div {
-    font-size: 1.1em;
     padding: 10px;
-}
-
-/* Highlight Important Values */
-#totalIncome {
-    color: green;
-    font-weight: bold;
-}
-
-#totalExpense {
-    color: red;
-    font-weight: bold;
-}
-
-#balanceLeft {
-    color: purple;
-    font-weight: bold;
-}
-
-/* Buttons */
-button {
-    background: #0073e6;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    margin: 5px 0;
-    cursor: pointer;
+    background-color: #ddd;
     border-radius: 5px;
+}
+
+#goalProgress {
+    margin-top: 20px;
+}
+
+input, select, button {
+    margin: 5px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+button {
+    background-color: #008CBA;
+    color: white;
+    cursor: pointer;
 }
 
 button:hover {
-    background: #005bb5;
+    background-color: #005f75;
 }
 
-/* Transaction List */
-.transaction-item {
-    background: #f8f8f8;
-    margin: 5px 0;
-    padding: 10px;
-    border-radius: 5px;
+h3 {
+    margin-top: 30px;
 }
 
-.transaction-item button {
-    background: red;
-    margin-left: 10px;
+#goalCategory, #goalAmount, #goalDeadline {
+    width: 150px;
+    display: inline-block;
 }
 
-/* Milestone Tracker */
-#milestones-list {
-    background: #fff3cd;
-    padding: 15px;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.progress-bar-container {
-    background: #ddd;
-    border-radius: 5px;
-    width: 100%;
-    margin-top: 5px;
-    position: relative;
-}
-
-.progress-bar {
-    background: #28a745;
-    height: 20px;
-    border-radius: 5px;
-    text-align: center;
-    color: white;
-    font-weight: bold;
-    transition: width 0.5s ease-in-out;
-}
-
-/* Chart Section */
 #chart-container {
     margin-top: 20px;
     text-align: center;
+}
+
+#exportCsvBtn {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+#exportCsvBtn:hover {
+    background-color: #45a049;
+}
+
+#transactions li {
+    padding: 10px;
+    margin: 5px 0;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    display: flex;
+    justify-content: space-between;
+}
+
+#transactions li:hover {
+    background-color: #e0e0e0;
 }
