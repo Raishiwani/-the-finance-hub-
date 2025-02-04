@@ -1,6 +1,8 @@
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-let milestones = JSON.parse(localStorage.getItem("milestones")) || [];
+let goal = JSON.parse(localStorage.getItem("goal")) || null;
 let transactionChart = null;
+let incomeExpenseChart = null;
+let expenseCategoryChart = null;
 
 // Add Transaction
 function addTransaction(event) {
@@ -18,8 +20,6 @@ function addTransaction(event) {
 
     const transaction = { description, amount, type, category };
     transactions.push(transaction);
-
-    // Save to localStorage
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
     renderTransactions();
@@ -33,34 +33,12 @@ function renderTransactions(filteredTransactions = transactions) {
 
     filteredTransactions.forEach((transaction, index) => {
         const li = document.createElement('li');
-        li.classList.add("transaction-item");
         li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
         <button onclick="deleteTransaction(${index})">Delete</button>`;
         transactionList.appendChild(li);
     });
 
-    const totalIncome = transactions.reduce((acc, t) => t.type === "income" ? acc + t.amount : acc, 0);
-    const totalExpense = transactions.reduce((acc, t) => t.type === "expense" ? acc + t.amount : acc, 0);
-    const balanceLeft = totalIncome - totalExpense;
-
-    document.getElementById("totalIncome").innerText = totalIncome;
-    document.getElementById("totalExpense").innerText = totalExpense;
-    document.getElementById("balanceLeft").innerText = balanceLeft;
-
-    // Transaction Analytics
-    const ratio = (totalExpense === 0 ? 0 : (totalIncome / totalExpense) * 100);
-    document.getElementById("ratio").innerText = `${ratio.toFixed(2)}%`;
-
-    // Top Categories
-    const expenseCategories = transactions.filter(t => t.type === "expense");
-    const incomeCategories = transactions.filter(t => t.type === "income");
-
-    const topExpenseCategory = findTopCategory(expenseCategories);
-    const topIncomeCategory = findTopCategory(incomeCategories);
-
-    document.getElementById("topExpenseCategory").innerText = topExpenseCategory;
-    document.getElementById("topIncomeCategory").innerText = topIncomeCategory;
-
+    calculateSummary();
     renderChart();
 }
 
@@ -71,18 +49,18 @@ function deleteTransaction(index) {
     renderTransactions();
 }
 
-// Find Top Category
-function findTopCategory(transactions) {
-    const categoryCount = transactions.reduce((acc, t) => {
-        acc[t.category] = (acc[t.category] || 0) + 1;
-        return acc;
-    }, {});
+// Calculate Summary
+function calculateSummary() {
+    const totalIncome = transactions.reduce((acc, t) => t.type === "income" ? acc + t.amount : acc, 0);
+    const totalExpense = transactions.reduce((acc, t) => t.type === "expense" ? acc + t.amount : acc, 0);
+    const balanceLeft = totalIncome - totalExpense;
 
-    const topCategory = Object.keys(categoryCount).reduce((a, b) => categoryCount[a] > categoryCount[b] ? a : b);
-    return topCategory;
+    document.getElementById("totalIncome").innerText = totalIncome;
+    document.getElementById("totalExpense").innerText = totalExpense;
+    document.getElementById("balanceLeft").innerText = balanceLeft;
 }
 
-// Render Chart
+// Render Charts
 function renderChart() {
     const ctx = document.getElementById("transactionChart").getContext("2d");
 
@@ -102,56 +80,65 @@ function renderChart() {
                 {
                     label: "Income",
                     data: incomeData,
-                    borderColor: "green",
                     fill: false,
+                    borderColor: "green",
+                    tension: 0.1
                 },
                 {
                     label: "Expense",
                     data: expenseData,
-                    borderColor: "red",
                     fill: false,
+                    borderColor: "red",
+                    tension: 0.1
                 }
             ]
         }
     });
 }
 
-// Add Milestone
-function addMilestone(event) {
-    event.preventDefault();
+// Set Goal
+function setGoal() {
+    const goalCategory = document.getElementById("goalCategory").value.trim();
+    const goalAmount = parseFloat(document.getElementById("goalAmount").value);
+    const goalDeadline = document.getElementById("goalDeadline").value;
 
-    const description = document.getElementById("milestone-description").value.trim();
-    const amount = parseFloat(document.getElementById("milestone-amount").value);
-
-    if (description === "" || isNaN(amount)) {
-        alert("Please enter valid goal details.");
+    if (goalCategory === "" || isNaN(goalAmount) || !goalDeadline) {
+        alert("Please fill all goal details.");
         return;
     }
 
-    const milestone = { description, amount, achieved: 0 };
-    milestones.push(milestone);
-    localStorage.setItem("milestones", JSON.stringify(milestones));
-    renderMilestones();
+    goal = { goalCategory, goalAmount, goalDeadline, progress: 0 };
+    localStorage.setItem("goal", JSON.stringify(goal));
 
-    alert("Milestone Added!");
+    renderGoalProgress();
 }
 
-// Render Milestones
-function renderMilestones() {
-    const milestoneList = document.getElementById('milestones-list');
-    milestoneList.innerHTML = "";
+// Render Goal Progress
+function renderGoalProgress() {
+    const progress = goal ? (goal.progress / goal.goalAmount) * 100 : 0;
 
-    milestones.forEach((milestone, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `${milestone.description}: ₹${milestone.amount} - 
-        <div class="progress-bar-container">
-            <div class="progress-bar" style="width:${(milestone.achieved / milestone.amount) * 100}%;">₹${milestone.achieved} of ₹${milestone.amount}</div>
-        </div>`;
-        milestoneList.appendChild(li);
-    });
+    document.getElementById("goalProgress").style.display = goal ? "block" : "none";
+    document.getElementById("goalDisplay").innerText = goal ? goal.goalCategory : "N/A";
+    document.getElementById("goalDeadlineDisplay").innerText = goal ? goal.goalDeadline : "N/A";
+    document.getElementById("goalProgressBar").value = progress;
+    document.getElementById("goalProgressText").innerText = `${Math.round(progress)}%`;
+}
+
+// Export Transactions to CSV
+function exportToCSV() {
+    const csvData = transactions.map(t => `${t.description},${t.amount},${t.type},${t.category}`).join("\n");
+    const csvContent = `Description,Amount,Type,Category\n${csvData}`;
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "transactions.csv";
+    link.click();
 }
 
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
-document.getElementById("milestone-form").addEventListener("submit", addMilestone);
+document.getElementById("setGoalButton").addEventListener("click", setGoal);
+document.getElementById("exportCsvBtn").addEventListener("click", exportToCSV);
 
+// Initial render
 renderTransactions();
+renderGoalProgress();
