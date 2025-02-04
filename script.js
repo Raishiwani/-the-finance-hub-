@@ -1,8 +1,6 @@
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let goal = JSON.parse(localStorage.getItem("goal")) || null;
 let transactionChart = null;
-let incomeExpenseChart = null;
-let expenseCategoryChart = null;
 
 // Add Transaction
 function addTransaction(event) {
@@ -99,8 +97,8 @@ function renderChart() {
 // Set Goal
 function setGoal() {
     const goalCategory = document.getElementById("goalCategory").value.trim();
-    const goalAmount = parseFloat(document.getElementById("goalAmount").value);
-    const goalDeadline = document.getElementById("goalDeadline").value;
+    const goalAmount = parseFloat(document.getElementById("milestone-amount").value);
+    const goalDeadline = document.getElementById("milestone-deadline").value;
 
     if (goalCategory === "" || isNaN(goalAmount) || !goalDeadline) {
         alert("Please fill all goal details.");
@@ -135,6 +133,7 @@ function exportToCSV() {
     link.click();
 }
 
+// Event Listeners
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
 document.getElementById("setGoalButton").addEventListener("click", setGoal);
 document.getElementById("exportCsvBtn").addEventListener("click", exportToCSV);
