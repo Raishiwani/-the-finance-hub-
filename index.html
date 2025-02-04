@@ -56,10 +56,22 @@
         <input type="number" id="milestone-amount">
     </div>
     <div>
-        <button id="setMilestone">Set Milestone</button>
+        <label for="goalCategory">Goal Category:</label>
+        <input type="text" id="goalCategory" placeholder="E.g., Vacation, Emergency Fund">
     </div>
+    <button id="setGoalButton">Set Goal</button>
+</div>
+
+<div id="goalProgress" style="display:none;">
+    <h4>Goal Progress</h4>
+    <div id="goalDisplay"></div>
+    <div id="goalDeadlineDisplay"></div>
+    <progress id="goalProgressBar" value="0" max="100"></progress>
+    <div id="goalProgressText">0%</div>
 </div>
 
 <div id="chart-container">
     <canvas id="transactionChart"></canvas>
 </div>
+
+<button id="exportCsvBtn">Export to CSV</button>
