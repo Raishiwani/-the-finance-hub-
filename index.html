@@ -1,77 +1,107 @@
-<header>
-    <h1>Personal Finance Management</h1>
-    <p>Track your spending, income, and savings.</p>
-</header>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Finance Management</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
 
-<div class="dashboard-container">
-    <div id="summary">
-        <div>Total Income: 💰 <span id="totalIncome">0</span></div>
-        <div>Total Expenses: 💸 <span id="totalExpense">0</span></div>
-        <div>Balance Left: 💵 <span id="balanceLeft">0</span></div>
-    </div>
+        .dashboard-container {
+            margin-top: 20px;
+        }
 
-    <h2>Transaction List 📋</h2>
-    <input type="text" id="search" placeholder="Search transactions...">
-    <select id="filterCategory">
-        <option value="all">All Categories</option>
-        <option value="food">Food 🍔</option>
-        <option value="rent">Rent 🏠</option>
-        <option value="salary">Salary 💼</option>
-        <option value="others">Others 🔄</option>
-    </select>
-    <ul id="transactions"></ul>
+        .summary {
+            margin-bottom: 20px;
+        }
 
-    <form id="transaction-form">
-        <input type="text" id="description" required placeholder="Description">
-        <input type="number" id="amount" required placeholder="Amount">
-        <select id="category">
+        .goal-container {
+            margin-top: 20px;
+        }
+
+        #transaction-form input, #transaction-form select, #transaction-form button {
+            margin: 5px;
+        }
+
+        .transaction-list {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Personal Finance Management</h1>
+        <p>Track your spending, income, and savings.</p>
+    </header>
+
+    <div class="dashboard-container">
+        <div id="summary">
+            <div>Total Income: 💰 <span id="totalIncome">0</span></div>
+            <div>Total Expenses: 💸 <span id="totalExpense">0</span></div>
+            <div>Balance Left: 💵 <span id="balanceLeft">0</span></div>
+        </div>
+
+        <h2>Transaction List 📋</h2>
+        <input type="text" id="search" placeholder="Search transactions...">
+        <select id="filterCategory">
+            <option value="all">All Categories</option>
             <option value="food">Food 🍔</option>
             <option value="rent">Rent 🏠</option>
             <option value="salary">Salary 💼</option>
             <option value="others">Others 🔄</option>
         </select>
-        <select id="type">
-            <option value="income">Income 💰</option>
-            <option value="expense">Expense 💸</option>
+        <ul id="transactions"></ul>
+
+        <form id="transaction-form">
+            <input type="text" id="description" required placeholder="Description">
+            <input type="number" id="amount" required placeholder="Amount">
+            <select id="category">
+                <option value="food">Food 🍔</option>
+                <option value="rent">Rent 🏠</option>
+                <option value="salary">Salary 💼</option>
+                <option value="others">Others 🔄</option>
+            </select>
+            <select id="type">
+                <option value="income">Income 💰</option>
+                <option value="expense">Expense 💸</option>
+            </select>
+            <button type="submit">Add Transaction</button>
+        </form>
+        
+        <label for="timePeriod">Select Time Period 📅:</label>
+        <select id="timePeriod">
+            <option value="daily">Daily 🗓️</option>
+            <option value="weekly">Weekly 📆</option>
+            <option value="monthly">Monthly 📅</option>
         </select>
-        <button type="submit">Add Transaction</button>
-    </form>
-    
-    <label for="timePeriod">Select Time Period 📅:</label>
-    <select id="timePeriod">
-        <option value="daily">Daily 🗓️</option>
-        <option value="weekly">Weekly 📆</option>
-        <option value="monthly">Monthly 📅</option>
-    </select>
-</div>
-
-<div id="milestone-container">
-    <h3>Set Your Milestone 🎯</h3>
-    <div>
-        <label for="milestone-description">Milestone Description:</label>
-        <input type="text" id="milestone-description" placeholder="E.g., Save for vacation">
     </div>
-    <div>
-        <label for="milestone-amount">Target Amount: ₹</label>
-        <input type="number" id="milestone-amount">
+
+    <div id="milestone-container">
+        <h3>Set Your Milestone 🎯</h3>
+        <div>
+            <label for="milestone-description">Milestone Description:</label>
+            <input type="text" id="milestone-description" placeholder="E.g., Save for vacation">
+        </div>
+        <div>
+            <label for="milestone-amount">Target Amount: ₹</label>
+            <input type="number" id="milestone-amount">
+        </div>
+        <div>
+            <button id="setGoalButton">Set Milestone</button>
+        </div>
     </div>
-    <div>
-        <label for="goalCategory">Goal Category:</label>
-        <input type="text" id="goalCategory" placeholder="E.g., Vacation, Emergency Fund">
+
+    <div id="chart-container">
+        <canvas id="transactionChart"></canvas>
     </div>
-    <button id="setGoalButton">Set Goal</button>
-</div>
 
-<div id="goalProgress" style="display:none;">
-    <h4>Goal Progress</h4>
-    <div id="goalDisplay"></div>
-    <div id="goalDeadlineDisplay"></div>
-    <progress id="goalProgressBar" value="0" max="100"></progress>
-    <div id="goalProgressText">0%</div>
-</div>
+    <button id="exportCsvBtn">Export to CSV</button>
 
-<div id="chart-container">
-    <canvas id="transactionChart"></canvas>
-</div>
-
-<button id="exportCsvBtn">Export to CSV</button>
+    <script src="script.js"></script>
+</body>
+</html>
