@@ -4,34 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Finance Management</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        /* Add your custom CSS styles here */
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-
-        .dashboard-container {
-            margin-top: 20px;
-        }
-
-        .summary {
-            margin-bottom: 20px;
-        }
-
-        .goal-container {
-            margin-top: 20px;
-        }
-
-        #transaction-form input, #transaction-form select, #transaction-form button {
-            margin: 5px;
-        }
-
-        .transaction-list {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
@@ -72,7 +45,7 @@
             </select>
             <button type="submit">Add Transaction</button>
         </form>
-        
+
         <label for="timePeriod">Select Time Period 📅:</label>
         <select id="timePeriod">
             <option value="daily">Daily 🗓️</option>
@@ -92,16 +65,16 @@
             <input type="number" id="milestone-amount">
         </div>
         <div>
-            <button id="setGoalButton">Set Milestone</button>
+            <button id="setMilestone">Set Milestone</button>
         </div>
+        <ul id="milestone-list"></ul>
     </div>
 
     <div id="chart-container">
         <canvas id="transactionChart"></canvas>
     </div>
 
-    <button id="exportCsvBtn">Export to CSV</button>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
