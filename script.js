@@ -24,12 +24,16 @@ function addTransaction(event) {
     document.getElementById("transaction-form").reset();
 }
 
-// Render Transactions
-function renderTransactions() {
+// Render Transactions with Search Functionality
+function renderTransactions(searchQuery = "") {
     const transactionList = document.getElementById('transactions');
     transactionList.innerHTML = "";
 
     transactions.forEach((transaction, index) => {
+        if (!transaction.description.toLowerCase().includes(searchQuery.toLowerCase())) {
+            return;
+        }
+        
         const li = document.createElement('li');
         li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
         <button onclick="deleteTransaction(${index})">Delete</button>`;
@@ -39,6 +43,11 @@ function renderTransactions() {
     updateSummary();
     renderChart();
 }
+
+// Search Transactions
+document.getElementById("search").addEventListener("input", function () {
+    renderTransactions(this.value);
+});
 
 // Delete Transaction
 function deleteTransaction(index) {
@@ -67,7 +76,7 @@ function setMilestone() {
         return;
     }
 
-    milestones.push({ description, amount });
+    milestones.push({ description, amount, saved: 0 });
     localStorage.setItem("milestones", JSON.stringify(milestones));
     renderMilestones();
 }
@@ -75,7 +84,21 @@ function setMilestone() {
 // Render Milestones
 function renderMilestones() {
     const milestoneList = document.getElementById("milestone-list");
-    milestoneList.innerHTML = milestones.map(m => `<li>${m.description} - ₹${m.amount}</li>`).join("");
+    milestoneList.innerHTML = "";
+    
+    milestones.forEach((milestone, index) => {
+        const li = document.createElement("li");
+        li.innerHTML = `${milestone.description} - Target: ₹${milestone.amount} | Saved: ₹${milestone.saved}
+        <button onclick="deleteMilestone(${index})">Delete</button>`;
+        milestoneList.appendChild(li);
+    });
+}
+
+// Delete Milestone
+function deleteMilestone(index) {
+    milestones.splice(index, 1);
+    localStorage.setItem("milestones", JSON.stringify(milestones));
+    renderMilestones();
 }
 
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
