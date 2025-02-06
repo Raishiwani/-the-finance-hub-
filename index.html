@@ -3,15 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Personal Finance Management</title>
+    <title>Finance Hub</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <header>
         <h1>Personal Finance Management</h1>
-        <p>Track your spending, income, and savings.</p>
     </header>
-
     <div class="dashboard-container">
         <div id="summary">
             <div>Total Income: 💰 <span id="totalIncome">0</span></div>
@@ -21,13 +19,6 @@
 
         <h2>Transaction List 📋</h2>
         <input type="text" id="search" placeholder="Search transactions...">
-        <select id="filterCategory">
-            <option value="all">All Categories</option>
-            <option value="food">Food 🍔</option>
-            <option value="rent">Rent 🏠</option>
-            <option value="salary">Salary 💼</option>
-            <option value="others">Others 🔄</option>
-        </select>
         <ul id="transactions"></ul>
 
         <form id="transaction-form">
@@ -45,29 +36,14 @@
             </select>
             <button type="submit">Add Transaction</button>
         </form>
-
-        <label for="timePeriod">Select Time Period 📅:</label>
-        <select id="timePeriod">
-            <option value="daily">Daily 🗓️</option>
-            <option value="weekly">Weekly 📆</option>
-            <option value="monthly">Monthly 📅</option>
-        </select>
     </div>
 
     <div id="milestone-container">
         <h3>Set Your Milestone 🎯</h3>
-        <div>
-            <label for="milestone-description">Milestone Description:</label>
-            <input type="text" id="milestone-description" placeholder="E.g., Save for vacation">
-        </div>
-        <div>
-            <label for="milestone-amount">Target Amount: ₹</label>
-            <input type="number" id="milestone-amount">
-        </div>
-        <div>
-            <button id="setMilestone">Set Milestone</button>
-        </div>
-        <ul id="milestone-list"></ul>
+        <input type="text" id="milestone-description" placeholder="E.g., Save for vacation">
+        <input type="number" id="milestone-amount" placeholder="Target Amount">
+        <button id="setMilestone">Set Milestone</button>
+        <div id="milestone-progress"></div>
     </div>
 
     <div id="chart-container">
