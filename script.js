@@ -1,4 +1,4 @@
-// Updated JavaScript with milestone tracking, multiple milestones, and line chart integration
+// Updated JavaScript Code for Finance Hub with Milestone Graph Tracking
 
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let milestones = JSON.parse(localStorage.getItem("milestones")) || [];
@@ -7,22 +7,22 @@ let transactionChart = null;
 // Add Transaction
 function addTransaction(event) {
     event.preventDefault();
-    
     const description = document.getElementById("description").value.trim();
     const amount = parseFloat(document.getElementById("amount").value);
     const type = document.getElementById("type").value;
     const category = document.getElementById("category").value;
-
+    
     if (description === "" || isNaN(amount)) {
-        alert("Please enter valid description and amount.");
+        alert("Please enter a valid description and amount.");
         return;
     }
-
+    
     const transaction = { description, amount, type, category };
     transactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(transactions));
-
+    
     renderTransactions();
+    updateMilestoneProgress();
     document.getElementById("transaction-form").reset();
 }
 
@@ -30,14 +30,12 @@ function addTransaction(event) {
 function renderTransactions() {
     const transactionList = document.getElementById('transactions');
     transactionList.innerHTML = "";
-
     transactions.forEach((transaction, index) => {
         const li = document.createElement('li');
         li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
         <button onclick="deleteTransaction(${index})">Delete</button>`;
         transactionList.appendChild(li);
     });
-
     calculateSummary();
     renderChart();
 }
@@ -47,6 +45,7 @@ function deleteTransaction(index) {
     transactions.splice(index, 1);
     localStorage.setItem("transactions", JSON.stringify(transactions));
     renderTransactions();
+    updateMilestoneProgress();
 }
 
 // Calculate Summary
@@ -60,52 +59,18 @@ function calculateSummary() {
     document.getElementById("balanceLeft").innerText = balanceLeft;
 }
 
-// Set Milestone
-function setMilestone() {
-    const milestoneDescription = document.getElementById("milestone-description").value.trim();
-    const milestoneAmount = parseFloat(document.getElementById("milestone-amount").value);
-
-    if (milestoneDescription === "" || isNaN(milestoneAmount)) {
-        alert("Please enter a valid milestone description and amount.");
-        return;
-    }
-
-    const milestone = { description: milestoneDescription, amount: milestoneAmount, progress: 0 };
-    milestones.push(milestone);
-    localStorage.setItem("milestones", JSON.stringify(milestones));
-
-    renderMilestones();
-    renderChart();
-    document.getElementById("milestone-description").value = "";
-    document.getElementById("milestone-amount").value = "";
-}
-
-// Render Milestone Progress
-function renderMilestones() {
-    const milestoneContainer = document.getElementById("milestone-container");
-    milestoneContainer.innerHTML = "<h3>Milestone Progress 🎯</h3>";
-    milestones.forEach((milestone, index) => {
-        const progress = (milestone.progress / milestone.amount) * 100;
-        milestoneContainer.innerHTML += `
-            <div>
-                <p>${milestone.description} - ₹${milestone.amount} (Progress: ${progress.toFixed(2)}%)</p>
-            </div>`;
-    });
-}
-
-// Render Chart (Including Milestone Data)
+// Render Line Chart with Milestone Tracking
 function renderChart() {
     const ctx = document.getElementById("transactionChart").getContext("2d");
-
     if (transactionChart !== null) {
         transactionChart.destroy();
     }
-
+    
     const labels = transactions.map(t => t.description);
     const incomeData = transactions.map(t => t.type === "income" ? t.amount : 0);
     const expenseData = transactions.map(t => t.type === "expense" ? t.amount : 0);
-    const milestoneData = milestones.map(m => m.amount);
-
+    const milestoneData = milestones.map(m => m.targetAmount);
+    
     transactionChart = new Chart(ctx, {
         type: "line",
         data: {
@@ -113,28 +78,66 @@ function renderChart() {
             datasets: [
                 {
                     label: "Income",
-                    data: [...incomeData, ...new Array(milestones.length).fill(0)],
+                    data: incomeData,
                     borderColor: "green",
                     tension: 0.1
                 },
                 {
                     label: "Expense",
-                    data: [...expenseData, ...new Array(milestones.length).fill(0)],
+                    data: expenseData,
                     borderColor: "red",
                     tension: 0.1
                 },
                 {
-                    label: "Milestone Goals",
-                    data: [...new Array(transactions.length).fill(0), ...milestoneData],
+                    label: "Milestones",
+                    data: milestoneData,
                     borderColor: "blue",
-                    borderDash: [5, 5],
-                    tension: 0.1
+                    tension: 0.1,
+                    borderDash: [5, 5]
                 }
             ]
         }
     });
 }
 
+// Set New Milestone
+function setMilestone() {
+    const description = document.getElementById("milestone-description").value.trim();
+    const targetAmount = parseFloat(document.getElementById("milestone-amount").value);
+    if (description === "" || isNaN(targetAmount)) {
+        alert("Please enter valid milestone details.");
+        return;
+    }
+    const newMilestone = { description, targetAmount, progress: 0 };
+    milestones.push(newMilestone);
+    localStorage.setItem("milestones", JSON.stringify(milestones));
+    renderMilestones();
+    updateMilestoneProgress();
+}
+
+// Render Milestones
+function renderMilestones() {
+    const milestoneContainer = document.getElementById("milestone-container");
+    milestoneContainer.innerHTML = "<h3>Milestones 🎯</h3>";
+    milestones.forEach((m, index) => {
+        const div = document.createElement("div");
+        div.innerHTML = `<p>${m.description}: Target ₹${m.targetAmount}, Progress: ₹${m.progress}</p>`;
+        milestoneContainer.appendChild(div);
+    });
+}
+
+// Update Milestone Progress
+function updateMilestoneProgress() {
+    let totalSavings = transactions.reduce((acc, t) => t.type === "income" ? acc + t.amount : acc - t.amount, 0);
+    milestones.forEach(m => {
+        m.progress = totalSavings >= m.targetAmount ? m.targetAmount : totalSavings;
+    });
+    localStorage.setItem("milestones", JSON.stringify(milestones));
+    renderMilestones();
+    renderChart();
+}
+
+// Event Listeners
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
 document.getElementById("setMilestone").addEventListener("click", setMilestone);
 
