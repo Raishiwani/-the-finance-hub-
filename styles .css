@@ -13,7 +13,7 @@ header {
     border-radius: 10px;
 }
 
-.dashboard-container {
+.dashboard-container, #milestone-container {
     background: white;
     padding: 15px;
     margin: 20px auto;
@@ -46,12 +46,12 @@ button:hover {
     background-color: #0056b3;
 }
 
-#transactions, #budgetList {
+#transactions, #milestoneList {
     list-style: none;
     padding: 0;
 }
 
-#transactions li, #budgetList li {
+#transactions li, #milestoneList li {
     background: #e9ecef;
     margin: 5px 0;
     padding: 10px;
@@ -60,15 +60,8 @@ button:hover {
     justify-content: space-between;
 }
 
-.progress-bar {
-    width: 100%;
-    height: 20px;
-    background-color: #f4f4f4;
-    border-radius: 5px;
-    margin-top: 10px;
-}
-
-.progress-bar div {
-    height: 100%;
-    border-radius: 5px;
+#chart-container {
+    width: 90%;
+    max-width: 600px;
+    margin: 20px auto;
 }
