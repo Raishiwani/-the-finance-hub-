@@ -58,6 +58,7 @@
             <input type="number" id="milestone-amount">
         </div>
         <button id="setMilestone">Set Milestone</button>
+        <button id="clearMilestones">Clear Milestones</button> <!-- New Button -->
         <ul id="milestoneList"></ul>
     </div>
 
@@ -66,11 +67,10 @@
         <canvas id="milestoneChart"></canvas>
     </div>
 
-    <!-- Feedback Container -->
-    <div id="celebration-container" style="display: none; text-align: center; margin-top: 20px;">
-        <h3>🎉 Congratulations! You have achieved your milestone! 🎉</h3>
-        <p>Great job on reaching your goal!</p>
-        <canvas id="confettiCanvas" style="position: absolute; width: 100%; height: 100%;"></canvas>
+    <div id="feedback-container" style="display: none;">
+        <h3>Milestone Achieved!</h3>
+        <p id="feedback-message"></p>
+        <div id="celebration-container"></div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
