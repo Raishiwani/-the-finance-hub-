@@ -1,4 +1,4 @@
-// Ensure localStorage stores transactions and milestones persistently
+// Retrieve transactions and milestones from localStorage
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 let milestones = JSON.parse(localStorage.getItem("milestones")) || [];
 let transactionChart = null;
@@ -18,28 +18,28 @@ function addTransaction(event) {
         return;
     }
 
-    const transaction = { description, amount, type, category };
+    const transaction = { description, amount, type, category, date: new Date().toLocaleDateString() };
     transactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(transactions));
-    
+
     renderTransactions();
     document.getElementById("transaction-form").reset();
 }
 
 // Render Transactions
 function renderTransactions(filteredTransactions = transactions) {
-    const transactionList = document.getElementById("transactions");
+    const transactionList = document.getElementById('transactions');
     transactionList.innerHTML = "";
 
     filteredTransactions.forEach((transaction, index) => {
-        const li = document.createElement("li");
-        li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category})
+        const li = document.createElement('li');
+        li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
         <button onclick="deleteTransaction(${index})">Delete</button>`;
         transactionList.appendChild(li);
     });
 
     calculateSummary();
-    renderTransactionChart();
+    renderCharts();
 }
 
 // Delete Transaction
@@ -60,10 +60,13 @@ function calculateSummary() {
     document.getElementById("balanceLeft").innerText = balanceLeft;
 }
 
-// Render Transaction Chart
-function renderTransactionChart() {
+// Render Charts
+function renderCharts() {
     const ctx = document.getElementById("transactionChart").getContext("2d");
-    if (transactionChart) transactionChart.destroy();
+
+    if (transactionChart !== null) {
+        transactionChart.destroy();
+    }
 
     const labels = transactions.map(t => t.description);
     const incomeData = transactions.map(t => t.type === "income" ? t.amount : 0);
@@ -74,25 +77,26 @@ function renderTransactionChart() {
         data: {
             labels: labels,
             datasets: [
-                { label: "Income", data: incomeData, borderColor: "green", tension: 0.1 },
-                { label: "Expense", data: expenseData, borderColor: "red", tension: 0.1 }
+                { label: "Income", data: incomeData, fill: false, borderColor: "green", tension: 0.1 },
+                { label: "Expense", data: expenseData, fill: false, borderColor: "red", tension: 0.1 }
             ]
         }
     });
+
+    renderMilestoneChart();
 }
 
 // Set Milestone
 function setMilestone() {
-    const milestoneDescription = document.getElementById("milestone-description").value.trim();
-    const milestoneAmount = parseFloat(document.getElementById("milestone-amount").value);
-
-    if (milestoneDescription === "" || isNaN(milestoneAmount)) {
+    const description = document.getElementById("milestone-description").value.trim();
+    const amount = parseFloat(document.getElementById("milestone-amount").value);
+    
+    if (description === "" || isNaN(amount)) {
         alert("Please enter valid milestone details.");
         return;
     }
 
-    const milestone = { milestoneDescription, milestoneAmount, progress: 0 };
-    milestones.push(milestone);
+    milestones.push({ description, amount, saved: 0 });
     localStorage.setItem("milestones", JSON.stringify(milestones));
 
     renderMilestoneChart();
@@ -101,32 +105,38 @@ function setMilestone() {
 // Render Milestone Chart
 function renderMilestoneChart() {
     const ctx = document.getElementById("milestoneChart").getContext("2d");
-    if (milestoneChart) milestoneChart.destroy();
 
-    const labels = milestones.map(m => m.milestoneDescription);
-    const milestoneData = milestones.map(m => m.milestoneAmount);
+    if (milestoneChart !== null) {
+        milestoneChart.destroy();
+    }
+
+    const labels = milestones.map(m => m.description);
+    const targetAmounts = milestones.map(m => m.amount);
+    const savedAmounts = milestones.map(m => m.saved);
 
     milestoneChart = new Chart(ctx, {
         type: "bar",
         data: {
             labels: labels,
-            datasets: [{ label: "Milestone Goals", data: milestoneData, backgroundColor: "blue" }]
+            datasets: [
+                { label: "Target Amount", data: targetAmounts, backgroundColor: "blue" },
+                { label: "Saved Amount", data: savedAmounts, backgroundColor: "green" }
+            ]
         }
     });
 }
 
 // Search Transactions
 function searchTransactions() {
-    const searchText = document.getElementById("search").value.toLowerCase();
-    const filteredTransactions = transactions.filter(t => t.description.toLowerCase().includes(searchText));
+    const searchQuery = document.getElementById("search").value.toLowerCase();
+    const filteredTransactions = transactions.filter(t => t.description.toLowerCase().includes(searchQuery));
     renderTransactions(filteredTransactions);
 }
 
-// Event Listeners
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
 document.getElementById("setMilestone").addEventListener("click", setMilestone);
 document.getElementById("search").addEventListener("input", searchTransactions);
 
-// Initial Render
+// Initial render
 renderTransactions();
 renderMilestoneChart();
