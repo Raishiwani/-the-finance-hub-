@@ -2,54 +2,53 @@ document.addEventListener("DOMContentLoaded", function () {
     let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
     let milestone = JSON.parse(localStorage.getItem("milestone")) || null;
     let transactionChart = null;
+    let milestoneChart = null;
 
-    // Function to add transactions
-    function addTransaction(event) {
+    // Add Transaction
+    document.getElementById("transaction-form").addEventListener("submit", function (event) {
         event.preventDefault();
-    
         const description = document.getElementById("description").value.trim();
         const amount = parseFloat(document.getElementById("amount").value);
         const type = document.getElementById("type").value;
         const category = document.getElementById("category").value;
-    
-        if (description === "" || isNaN(amount)) {
-            alert("Please enter valid details.");
+
+        if (!description || isNaN(amount)) {
+            alert("Please enter valid details!");
             return;
         }
-    
-        const transaction = { description, amount, type, category };
-        transactions.push(transaction);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-    
-        renderTransactions();
-        document.getElementById("transaction-form").reset();
-    }
 
-    // Function to render transactions
+        transactions.push({ description, amount, type, category });
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+
+        document.getElementById("transaction-form").reset();
+        renderTransactions();
+    });
+
+    // Render Transactions
     function renderTransactions(filteredTransactions = transactions) {
-        const transactionList = document.getElementById('transactions');
+        const transactionList = document.getElementById("transactions");
         transactionList.innerHTML = "";
 
         filteredTransactions.forEach((transaction, index) => {
-            const li = document.createElement('li');
+            const li = document.createElement("li");
             li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
             <button onclick="deleteTransaction(${index})">Delete</button>`;
             transactionList.appendChild(li);
         });
 
-        calculateSummary();
-        renderChart();
+        updateSummary();
+        renderTransactionChart();
     }
 
-    // Function to delete transaction
-    function deleteTransaction(index) {
+    // Delete Transaction
+    window.deleteTransaction = function (index) {
         transactions.splice(index, 1);
         localStorage.setItem("transactions", JSON.stringify(transactions));
         renderTransactions();
-    }
+    };
 
-    // Function to calculate income and expenses
-    function calculateSummary() {
+    // Update Summary
+    function updateSummary() {
         const totalIncome = transactions.reduce((acc, t) => t.type === "income" ? acc + t.amount : acc, 0);
         const totalExpense = transactions.reduce((acc, t) => t.type === "expense" ? acc + t.amount : acc, 0);
         const balanceLeft = totalIncome - totalExpense;
@@ -59,13 +58,32 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById("balanceLeft").innerText = balanceLeft;
     }
 
-    // Function to render chart
-    function renderChart() {
-        const ctx = document.getElementById("transactionChart").getContext("2d");
+    // Search Transactions
+    document.getElementById("search").addEventListener("input", function () {
+        const searchText = this.value.toLowerCase();
+        const filtered = transactions.filter(t => t.description.toLowerCase().includes(searchText));
+        renderTransactions(filtered);
+    });
 
-        if (transactionChart !== null) {
-            transactionChart.destroy();
+    // Set Milestone
+    document.getElementById("setMilestone").addEventListener("click", function () {
+        const description = document.getElementById("milestone-description").value.trim();
+        const targetAmount = parseFloat(document.getElementById("milestone-amount").value);
+
+        if (!description || isNaN(targetAmount)) {
+            alert("Enter valid milestone details!");
+            return;
         }
+
+        milestone = { description, targetAmount, progress: 0 };
+        localStorage.setItem("milestone", JSON.stringify(milestone));
+        renderMilestoneChart();
+    });
+
+    // Render Transaction Chart
+    function renderTransactionChart() {
+        const ctx = document.getElementById("transactionChart").getContext("2d");
+        if (transactionChart) transactionChart.destroy();
 
         const labels = transactions.map(t => t.description);
         const incomeData = transactions.map(t => t.type === "income" ? t.amount : 0);
@@ -76,71 +94,28 @@ document.addEventListener("DOMContentLoaded", function () {
             data: {
                 labels: labels,
                 datasets: [
-                    {
-                        label: "Income",
-                        data: incomeData,
-                        fill: false,
-                        borderColor: "green",
-                        tension: 0.1
-                    },
-                    {
-                        label: "Expense",
-                        data: expenseData,
-                        fill: false,
-                        borderColor: "red",
-                        tension: 0.1
-                    }
+                    { label: "Income", data: incomeData, borderColor: "green", fill: false },
+                    { label: "Expense", data: expenseData, borderColor: "red", fill: false }
                 ]
             }
         });
     }
 
-    // Function to search transactions
-    document.getElementById("search").addEventListener("input", function () {
-        const query = this.value.toLowerCase();
-        const filteredTransactions = transactions.filter(t =>
-            t.description.toLowerCase().includes(query) || 
-            t.category.toLowerCase().includes(query)
-        );
-        renderTransactions(filteredTransactions);
-    });
+    // Render Milestone Chart
+    function renderMilestoneChart() {
+        const ctx = document.getElementById("milestoneChart").getContext("2d");
+        if (!milestone) return;
+        if (milestoneChart) milestoneChart.destroy();
 
-    // Function to set milestone
-    document.getElementById("setMilestone").addEventListener("click", function () {
-        const milestoneDescription = document.getElementById("milestone-description").value.trim();
-        const milestoneAmount = parseFloat(document.getElementById("milestone-amount").value);
-
-        if (milestoneDescription === "" || isNaN(milestoneAmount)) {
-            alert("Please enter valid milestone details.");
-            return;
-        }
-
-        milestone = { description: milestoneDescription, amount: milestoneAmount, progress: 0 };
-        localStorage.setItem("milestone", JSON.stringify(milestone));
-
-        renderMilestone();
-    });
-
-    // Function to render milestone
-    function renderMilestone() {
-        if (milestone) {
-            document.getElementById("goalProgress").style.display = "block";
-            document.getElementById("goalProgressText").innerText = `${milestone.description} - ₹${milestone.amount}`;
-        }
+        milestoneChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: ["Target", "Saved"],
+                datasets: [{ label: "Milestone Progress", data: [milestone.targetAmount, milestone.progress], backgroundColor: ["blue", "green"] }]
+            }
+        });
     }
 
-    // Function to export transactions to CSV
-    document.getElementById("exportCsvBtn").addEventListener("click", function () {
-        const csvData = transactions.map(t => `${t.description},${t.amount},${t.type},${t.category}`).join("\n");
-        const csvContent = `Description,Amount,Type,Category\n${csvData}`;
-        const blob = new Blob([csvContent], { type: "text/csv" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "transactions.csv";
-        link.click();
-    });
-
-    // Initial rendering
     renderTransactions();
-    renderMilestone();
+    renderMilestoneChart();
 });
