@@ -1,8 +1,6 @@
-// Retrieve transactions and milestones from localStorage
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-let milestones = JSON.parse(localStorage.getItem("milestones")) || [];
+let budgets = JSON.parse(localStorage.getItem("budgets")) || [];
 let transactionChart = null;
-let milestoneChart = null;
 
 // Add Transaction
 function addTransaction(event) {
@@ -82,89 +80,55 @@ function renderCharts() {
             ]
         }
     });
-
-    renderMilestoneChart();
 }
 
-// Set Milestone
-function setMilestone() {
-    const description = document.getElementById("milestone-description").value.trim();
-    const amount = parseFloat(document.getElementById("milestone-amount").value);
-    
-    if (description === "" || isNaN(amount)) {
-        alert("Please enter valid milestone details.");
+// Set Budget
+function setBudget() {
+    const category = document.getElementById("budget-category").value;
+    const amount = parseFloat(document.getElementById("budget-amount").value);
+
+    if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid budget amount.");
         return;
     }
 
-    milestones.push({ description, amount, saved: 0 });
-    localStorage.setItem("milestones", JSON.stringify(milestones));
-
-    renderMilestoneChart();
-    renderMilestoneList();
-}
-
-// Clear Milestones
-function clearMilestones() {
-    milestones = [];
-    localStorage.setItem("milestones", JSON.stringify(milestones));
-    renderMilestoneChart();
-    renderMilestoneList();
-}
-
-// Render Milestone List
-function renderMilestoneList() {
-    const milestoneList = document.getElementById('milestoneList');
-    milestoneList.innerHTML = "";
-
-    milestones.forEach((milestone, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `${milestone.description}: ₹${milestone.amount} (Target) 
-        <button onclick="deleteMilestone(${index})">Delete</button>`;
-        milestoneList.appendChild(li);
-    });
-}
-
-// Render Milestone Chart
-function renderMilestoneChart() {
-    const ctx = document.getElementById("milestoneChart").getContext("2d");
-
-    if (milestoneChart !== null) {
-        milestoneChart.destroy();
+    const existingBudget = budgets.find(b => b.category === category);
+    if (existingBudget) {
+        existingBudget.amount = amount;
+        existingBudget.spent = 0;
+    } else {
+        budgets.push({ category, amount, spent: 0 });
     }
 
-    const labels = milestones.map(m => m.description);
-    const data = milestones.map(m => m.saved);
-    const targetData = milestones.map(m => m.amount);
+    localStorage.setItem("budgets", JSON.stringify(budgets));
+    renderBudgetList();
+}
 
-    milestoneChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [
-                { label: "Saved", data: data, backgroundColor: "blue", borderColor: "blue", borderWidth: 1 },
-                { label: "Target", data: targetData, backgroundColor: "lightgray", borderColor: "gray", borderWidth: 1 }
-            ]
-        }
+// Render Budget List with Progress Bars
+function renderBudgetList() {
+    const budgetList = document.getElementById("budgetList");
+    budgetList.innerHTML = "";
+
+    budgets.forEach(budget => {
+        const li = document.createElement("li");
+        li.innerHTML = `${budget.category}: ₹${budget.amount} (Budget) - ₹${budget.spent} (Spent)`;
+
+        const progressBar = document.createElement("div");
+        progressBar.classList.add("progress-bar");
+
+        const progress = document.createElement("div");
+        const percentageSpent = (budget.spent / budget.amount) * 100;
+        progress.style.width = percentageSpent + "%";
+        progress.style.backgroundColor = percentageSpent >= 100 ? "red" : "green";
+
+        progressBar.appendChild(progress);
+        li.appendChild(progressBar);
+        budgetList.appendChild(li);
     });
 }
 
-// Milestone Feedback
-function showMilestoneFeedback() {
-    const feedbackMessage = document.getElementById("feedback-message");
-    const celebrationContainer = document.getElementById("celebration-container");
-    feedbackMessage.innerText = "Congratulations! You've achieved your milestone!";
-    celebrationContainer.style.display = "inline-block"; // Show celebration
-
-    setTimeout(() => {
-        document.getElementById("feedback-container").style.display = "none";
-    }, 3000);
-}
-
-// Event Listeners
+document.getElementById("set-budget").addEventListener("click", setBudget);
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
-document.getElementById("setMilestone").addEventListener("click", setMilestone);
-document.getElementById("clearMilestones").addEventListener("click", clearMilestones);
 
-// Initial Render
 renderTransactions();
-renderMilestoneList();
+renderBudgetList();
