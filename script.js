@@ -1,8 +1,5 @@
-// Retrieve transactions and milestones from localStorage
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-let milestones = JSON.parse(localStorage.getItem("milestones")) || [];
-let transactionChart = null;
-let milestoneChart = null;
+let budgets = JSON.parse(localStorage.getItem("budgets")) || [];
 
 // Add Transaction
 function addTransaction(event) {
@@ -22,16 +19,19 @@ function addTransaction(event) {
     transactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
+    // Update spent amount for category
+    updateSpentAmount(category, amount, type);
+    
     renderTransactions();
     document.getElementById("transaction-form").reset();
 }
 
 // Render Transactions
-function renderTransactions(filteredTransactions = transactions) {
+function renderTransactions() {
     const transactionList = document.getElementById('transactions');
     transactionList.innerHTML = "";
 
-    filteredTransactions.forEach((transaction, index) => {
+    transactions.forEach((transaction, index) => {
         const li = document.createElement('li');
         li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
         <button onclick="deleteTransaction(${index})">Delete</button>`;
@@ -39,104 +39,85 @@ function renderTransactions(filteredTransactions = transactions) {
     });
 
     calculateSummary();
-    renderCharts();
+    renderBudgetList();
 }
 
 // Delete Transaction
 function deleteTransaction(index) {
+    const transaction = transactions[index];
     transactions.splice(index, 1);
     localStorage.setItem("transactions", JSON.stringify(transactions));
+
+    // Update spent amount when deleting transaction
+    updateSpentAmount(transaction.category, transaction.amount, transaction.type === 'expense' ? 'income' : 'expense');
+    
     renderTransactions();
 }
 
-// Calculate Summary
-function calculateSummary() {
-    const totalIncome = transactions.reduce((acc, t) => t.type === "income" ? acc + t.amount : acc, 0);
-    const totalExpense = transactions.reduce((acc, t) => t.type === "expense" ? acc + t.amount : acc, 0);
-    const balanceLeft = totalIncome - totalExpense;
+// Update Spent Amount for Category
+function updateSpentAmount(category, amount, type) {
+    const budget = budgets.find(b => b.category === category);
+    if (!budget) return;
 
-    document.getElementById("totalIncome").innerText = totalIncome;
-    document.getElementById("totalExpense").innerText = totalExpense;
-    document.getElementById("balanceLeft").innerText = balanceLeft;
-}
-
-// Render Charts
-function renderCharts() {
-    const ctx = document.getElementById("transactionChart").getContext("2d");
-
-    if (transactionChart !== null) {
-        transactionChart.destroy();
+    if (type === 'expense') {
+        budget.spent += amount;
+    } else if (type === 'income') {
+        budget.spent -= amount; // reduce spent if it's income
     }
 
-    const labels = transactions.map(t => t.description);
-    const incomeData = transactions.map(t => t.type === "income" ? t.amount : 0);
-    const expenseData = transactions.map(t => t.type === "expense" ? t.amount : 0);
-
-    transactionChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [
-                { label: "Income", data: incomeData, fill: false, borderColor: "green", tension: 0.1 },
-                { label: "Expense", data: expenseData, fill: false, borderColor: "red", tension: 0.1 }
-            ]
-        }
-    });
-
-    renderMilestoneChart();
+    localStorage.setItem("budgets", JSON.stringify(budgets));
+    renderBudgetList();
 }
 
-// Set Milestone
-function setMilestone() {
-    const description = document.getElementById("milestone-description").value.trim();
-    const amount = parseFloat(document.getElementById("milestone-amount").value);
-    
-    if (description === "" || isNaN(amount)) {
-        alert("Please enter valid milestone details.");
+// Set Budget
+function setBudget() {
+    const category = document.getElementById("budget-category").value;
+    const amount = parseFloat(document.getElementById("budget-amount").value);
+
+    if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid budget amount.");
         return;
     }
 
-    milestones.push({ description, amount, saved: 0 });
-    localStorage.setItem("milestones", JSON.stringify(milestones));
-
-    renderMilestoneChart();
-}
-
-// Render Milestone Chart
-function renderMilestoneChart() {
-    const ctx = document.getElementById("milestoneChart").getContext("2d");
-
-    if (milestoneChart !== null) {
-        milestoneChart.destroy();
+    // Check if the category already has a budget
+    const existingBudget = budgets.find(b => b.category === category);
+    if (existingBudget) {
+        existingBudget.amount = amount;
+        existingBudget.spent = 0; // reset spent
+    } else {
+        budgets.push({ category, amount, spent: 0 });
     }
 
-    const labels = milestones.map(m => m.description);
-    const targetAmounts = milestones.map(m => m.amount);
-    const savedAmounts = milestones.map(m => m.saved);
+    localStorage.setItem("budgets", JSON.stringify(budgets));
+    renderBudgetList();
+}
 
-    milestoneChart = new Chart(ctx, {
-        type: "bar",
-        data: {
-            labels: labels,
-            datasets: [
-                { label: "Target Amount", data: targetAmounts, backgroundColor: "blue" },
-                { label: "Saved Amount", data: savedAmounts, backgroundColor: "green" }
-            ]
-        }
+// Render Budget List with Progress Bars
+function renderBudgetList() {
+    const budgetList = document.getElementById("budgetList");
+    budgetList.innerHTML = "";
+
+    budgets.forEach(budget => {
+        const li = document.createElement("li");
+        li.innerHTML = `${budget.category}: ₹${budget.amount} (Budget) - ₹${budget.spent} (Spent)`;
+
+        const progressBar = document.createElement("div");
+        progressBar.classList.add("progress-bar");
+
+        const progress = document.createElement("div");
+        const percentageSpent = (budget.spent / budget.amount) * 100;
+        progress.style.width = percentageSpent + "%";
+        progress.style.backgroundColor = percentageSpent >= 100 ? "red" : "green";
+
+        progressBar.appendChild(progress);
+        li.appendChild(progressBar);
+        budgetList.appendChild(li);
     });
 }
 
-// Search Transactions
-function searchTransactions() {
-    const searchQuery = document.getElementById("search").value.toLowerCase();
-    const filteredTransactions = transactions.filter(t => t.description.toLowerCase().includes(searchQuery));
-    renderTransactions(filteredTransactions);
-}
-
+// Initialize event listeners
+document.getElementById("set-budget").addEventListener("click", setBudget);
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
-document.getElementById("setMilestone").addEventListener("click", setMilestone);
-document.getElementById("search").addEventListener("input", searchTransactions);
 
-// Initial render
 renderTransactions();
-renderMilestoneChart();
+renderBudgetList();
