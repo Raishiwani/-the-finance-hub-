@@ -17,11 +17,19 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
 
-        transactions.push({ description, amount, type, category });
+        const transaction = { description, amount, type, category };
+        transactions.push(transaction);
         localStorage.setItem("transactions", JSON.stringify(transactions));
+
+        // If income, update milestone progress
+        if (type === "income" && milestone) {
+            milestone.progress += amount;
+            localStorage.setItem("milestone", JSON.stringify(milestone));
+        }
 
         document.getElementById("transaction-form").reset();
         renderTransactions();
+        renderMilestoneChart();
     });
 
     // Render Transactions
