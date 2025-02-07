@@ -115,6 +115,17 @@ function renderBudgetList() {
     });
 }
 
+// Calculate Summary (Income, Expenses, and Balance)
+function calculateSummary() {
+    const totalIncome = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+    const totalExpense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+    const balanceLeft = totalIncome - totalExpense;
+
+    document.getElementById("totalIncome").textContent = totalIncome.toFixed(2);
+    document.getElementById("totalExpense").textContent = totalExpense.toFixed(2);
+    document.getElementById("balanceLeft").textContent = balanceLeft.toFixed(2);
+}
+
 // Initialize event listeners
 document.getElementById("set-budget").addEventListener("click", setBudget);
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
