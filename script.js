@@ -92,12 +92,11 @@ function setMilestone() {
     const amount = parseFloat(document.getElementById("milestone-amount").value);
     
     if (description === "" || isNaN(amount)) {
-        alert("Please enter valid milestone details.");
+        alert("Please enter a valid description and amount.");
         return;
     }
 
     milestones.push({ description, amount, saved: 0 });
-
     localStorage.setItem("milestones", JSON.stringify(milestones));
 
     renderMilestoneChart();
