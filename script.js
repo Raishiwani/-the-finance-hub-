@@ -20,8 +20,6 @@ function addTransaction(event) {
 
     const transaction = { description, amount, type, category, date: new Date().toLocaleDateString() };
     transactions.push(transaction);
-
-    // Save data to localStorage
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
     renderTransactions();
@@ -47,7 +45,7 @@ function renderTransactions(filteredTransactions = transactions) {
 // Delete Transaction
 function deleteTransaction(index) {
     transactions.splice(index, 1);
-    localStorage.setItem("transactions", JSON.stringify(transactions)); // Re-save to localStorage
+    localStorage.setItem("transactions", JSON.stringify(transactions));
     renderTransactions();
 }
 
@@ -100,7 +98,6 @@ function setMilestone() {
 
     milestones.push({ description, amount, saved: 0 });
 
-    // Save data to localStorage
     localStorage.setItem("milestones", JSON.stringify(milestones));
 
     renderMilestoneChart();
@@ -116,16 +113,16 @@ function renderMilestoneChart() {
     }
 
     const labels = milestones.map(m => m.description);
-    const targetAmounts = milestones.map(m => m.amount);
-    const savedAmounts = milestones.map(m => m.saved);
+    const data = milestones.map(m => m.saved);
+    const targetData = milestones.map(m => m.amount);
 
     milestoneChart = new Chart(ctx, {
         type: "bar",
         data: {
             labels: labels,
             datasets: [
-                { label: "Target Amount", data: targetAmounts, backgroundColor: "blue" },
-                { label: "Saved Amount", data: savedAmounts, backgroundColor: "green" }
+                { label: "Saved", data: data, backgroundColor: "blue", borderColor: "blue", borderWidth: 1 },
+                { label: "Target", data: targetData, backgroundColor: "lightgray", borderColor: "gray", borderWidth: 1 }
             ]
         }
     });
@@ -141,22 +138,59 @@ function checkMilestoneAchievements() {
     });
 }
 
-// Show confetti when milestone is reached
+// Show Confetti Effect
 function showConfetti() {
-    canvasConfetti();
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const confetti = [];
+
+    function createConfetti() {
+        const particle = {
+            x: Math.random() * canvas.width,
+            y: -10,
+            size: Math.random() * 5 + 5,
+            speed: Math.random() * 3 + 1,
+            angle: Math.random() * 2 * Math.PI,
+            color: `hsl(${Math.random() * 360}, 100%, 50%)`
+        };
+        confetti.push(particle);
+    }
+
+    for (let i = 0; i < 100; i++) {
+        createConfetti();
+    }
+
+    function animateConfetti() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        confetti.forEach((particle, index) => {
+            particle.y += particle.speed;
+            particle.x += Math.sin(particle.angle) * 2;
+
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fillStyle = particle.color;
+            ctx.fill();
+
+            if (particle.y > canvas.height) {
+                confetti.splice(index, 1);
+            }
+        });
+
+        if (confetti.length > 0) {
+            requestAnimationFrame(animateConfetti);
+        }
+    }
+
+    animateConfetti();
 }
 
-// Search Transactions
-function searchTransactions() {
-    const searchQuery = document.getElementById("search").value.toLowerCase();
-    const filteredTransactions = transactions.filter(t => t.description.toLowerCase().includes(searchQuery));
-    renderTransactions(filteredTransactions);
-}
-
+// Event Listeners
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
 document.getElementById("setMilestone").addEventListener("click", setMilestone);
-document.getElementById("search").addEventListener("input", searchTransactions);
 
-// Initial render to ensure data is loaded from localStorage
-renderTransactions();
-renderMilestoneChart();
+renderTransactions();  // Initial render for transactions and milestone charts
