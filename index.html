@@ -1,72 +1,129 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Finance Hub</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Finance Hub</title>
+  <!-- Link to Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <header>
-        <h1>Personal Finance Management</h1>
-        <p>Track your spending, income, savings, and milestones.</p>
-    </header>
-    
-    <div class="dashboard-container">
-        <div id="summary">
-            <div>Total Income: 💰 <span id="totalIncome">0</span></div>
-            <div>Total Expenses: 💸 <span id="totalExpense">0</span></div>
-            <div>Balance Left: 💵 <span id="balanceLeft">0</span></div>
-        </div>
+  <!-- Filter UI -->
+  <div>
+    <label for="time-filter">Select Time Period:</label>
+    <select id="time-filter" onchange="applyFilter()">
+      <option value="daily">Daily</option>
+      <option value="weekly">Weekly</option>
+      <option value="monthly">Monthly</option>
+    </select>
+  </div>
 
-        <h2>Transaction List 📋</h2>
-        <input type="text" id="search" placeholder="Search transactions...">
-        <select id="filterCategory">
-            <option value="all">All Categories</option>
-            <option value="food">Food 🍔</option>
-            <option value="rent">Rent 🏠</option>
-            <option value="salary">Salary 💼</option>
-            <option value="others">Others 🔄</option>
-        </select>
-        <ul id="transactions"></ul>
+  <!-- Canvas for Chart.js -->
+  <canvas id="chart" width="400" height="200"></canvas>
 
-        <form id="transaction-form">
-            <input type="text" id="description" required placeholder="Description">
-            <input type="number" id="amount" required placeholder="Amount">
-            <select id="category">
-                <option value="food">Food 🍔</option>
-                <option value="rent">Rent 🏠</option>
-                <option value="salary">Salary 💼</option>
-                <option value="others">Others 🔄</option>
-            </select>
-            <select id="type">
-                <option value="income">Income 💰</option>
-                <option value="expense">Expense 💸</option>
-            </select>
-            <button type="submit">Add Transaction</button>
-        </form>
-    </div>
+  <!-- Your original script that initializes the chart and data -->
+  <script>
+    // Example transaction data (original data remains unchanged)
+    const transactions = [
+      { date: '2025-02-01', amount: 100, category: 'Food' },
+      { date: '2025-02-02', amount: 150, category: 'Transport' },
+      { date: '2025-02-08', amount: 50, category: 'Entertainment' },
+      { date: '2025-02-10', amount: 200, category: 'Food' },
+      { date: '2025-02-15', amount: 120, category: 'Transport' },
+      { date: '2025-02-20', amount: 80, category: 'Entertainment' }
+    ];
 
-    <div id="milestone-container">
-        <h3>Set Your Milestones 🎯</h3>
-        <div>
-            <label for="milestone-description">Milestone Description:</label>
-            <input type="text" id="milestone-description" placeholder="E.g., Save for vacation">
-        </div>
-        <div>
-            <label for="milestone-amount">Target Amount: ₹</label>
-            <input type="number" id="milestone-amount">
-        </div>
-        <button id="setMilestone">Set Milestone</button>
-        <ul id="milestoneList"></ul>
-    </div>
+    // Initialize chart
+    const ctx = document.getElementById('chart').getContext('2d');
+    const chart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: [], // Initially empty, will be updated with filtered data
+        datasets: [{
+          label: 'Expenses',
+          data: [], // Initially empty, will be updated with filtered data
+          borderColor: 'rgb(75, 192, 192)',
+          fill: false
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false
+      }
+    });
 
-    <div id="chart-container">
-        <canvas id="transactionChart"></canvas>
-        <canvas id="milestoneChart"></canvas>
-    </div>
+    let filteredData = [];
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
+    // Function to apply selected filter (daily, weekly, monthly)
+    function applyFilter() {
+      const filter = document.getElementById('time-filter').value;
+      switch (filter) {
+        case 'daily':
+          filteredData = filterData('day');
+          break;
+        case 'weekly':
+          filteredData = filterData('week');
+          break;
+        case 'monthly':
+          filteredData = filterData('month');
+          break;
+      }
+
+      // Update chart with the filtered data
+      updateChart(filteredData);
+    }
+
+    // Function to filter the transactions based on the selected period
+    function filterData(period) {
+      const filteredTransactions = []; // This will store the filtered data
+      transactions.forEach(transaction => {
+        const date = new Date(transaction.date);
+        let periodKey;
+
+        // Apply the filter logic without changing the original transactions
+        if (period === 'day') {
+          periodKey = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+        } else if (period === 'week') {
+          const startOfWeek = new Date(date.setDate(date.getDate() - date.getDay()));
+          periodKey = `${startOfWeek.getFullYear()}-W${Math.ceil((startOfWeek.getDate() - 1) / 7)}`;
+        } else if (period === 'month') {
+          periodKey = `${date.getFullYear()}-${date.getMonth() + 1}`;
+        }
+
+        // Store the filtered data
+        filteredTransactions.push({
+          period: periodKey,
+          amount: transaction.amount,
+        });
+      });
+
+      // Aggregate data based on the selected period
+      const aggregatedData = aggregate(filteredTransactions);
+      return aggregatedData;
+    }
+
+    // Function to aggregate the filtered transactions by period
+    function aggregate(transactions) {
+      const aggregatedData = {};
+      transactions.forEach(transaction => {
+        if (!aggregatedData[transaction.period]) {
+          aggregatedData[transaction.period] = 0;
+        }
+        aggregatedData[transaction.period] += transaction.amount;
+      });
+
+      return Object.entries(aggregatedData).map(([period, totalAmount]) => ({
+        period,
+        totalAmount,
+      }));
+    }
+
+    // Function to update the chart with new data
+    function updateChart(data) {
+      chart.data.labels = data.map(item => item.period);
+      chart.data.datasets[0].data = data.map(item => item.totalAmount);
+      chart.update();
+    }
+  </script>
 </body>
 </html>
