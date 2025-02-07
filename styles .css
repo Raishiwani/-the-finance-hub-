@@ -28,6 +28,10 @@ header {
     border-radius: 5px;
 }
 
+#goalProgress {
+    margin-top: 20px;
+}
+
 input, select, button {
     margin: 5px;
     padding: 10px;
@@ -49,9 +53,27 @@ h3 {
     margin-top: 30px;
 }
 
+#goalCategory, #goalAmount, #goalDeadline {
+    width: 150px;
+    display: inline-block;
+}
+
 #chart-container {
     margin-top: 20px;
     text-align: center;
+}
+
+#exportCsvBtn {
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+#exportCsvBtn:hover {
+    background-color: #45a049;
 }
 
 #transactions li {
@@ -67,14 +89,27 @@ h3 {
     background-color: #e0e0e0;
 }
 
-#milestone-list {
-    list-style-type: none;
-    padding: 0;
+/* Milestone Section */
+#milestone-container {
+    margin-top: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
 }
 
-#milestone-list li {
-    background: #f4f4f4;
-    padding: 10px;
-    margin: 5px 0;
+#milestoneProgress {
+    margin-top: 15px;
+}
+
+#milestoneProgressBar {
+    width: 100%;
+    height: 20px;
     border-radius: 5px;
+    background-color: #e0e0e0;
+}
+
+#goalProgressText {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 5px;
 }
