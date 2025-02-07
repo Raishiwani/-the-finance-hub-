@@ -92,7 +92,7 @@ function setMilestone() {
     const amount = parseFloat(document.getElementById("milestone-amount").value);
     
     if (description === "" || isNaN(amount)) {
-        alert("Please enter a valid description and amount.");
+        alert("Please enter valid milestone details.");
         return;
     }
 
@@ -100,7 +100,28 @@ function setMilestone() {
     localStorage.setItem("milestones", JSON.stringify(milestones));
 
     renderMilestoneChart();
-    checkMilestoneAchievements();
+    renderMilestoneList();
+}
+
+// Clear Milestones
+function clearMilestones() {
+    milestones = [];
+    localStorage.setItem("milestones", JSON.stringify(milestones));
+    renderMilestoneChart();
+    renderMilestoneList();
+}
+
+// Render Milestone List
+function renderMilestoneList() {
+    const milestoneList = document.getElementById('milestoneList');
+    milestoneList.innerHTML = "";
+
+    milestones.forEach((milestone, index) => {
+        const li = document.createElement('li');
+        li.innerHTML = `${milestone.description}: ₹${milestone.amount} (Target) 
+        <button onclick="deleteMilestone(${index})">Delete</button>`;
+        milestoneList.appendChild(li);
+    });
 }
 
 // Render Milestone Chart
@@ -127,69 +148,23 @@ function renderMilestoneChart() {
     });
 }
 
-// Check Milestone Achievements
-function checkMilestoneAchievements() {
-    milestones.forEach((milestone, index) => {
-        if (milestone.saved >= milestone.amount) {
-            document.getElementById('celebration-container').style.display = 'block';
-            showConfetti();
-        }
-    });
-}
+// Milestone Feedback
+function showMilestoneFeedback() {
+    const feedbackMessage = document.getElementById("feedback-message");
+    const celebrationContainer = document.getElementById("celebration-container");
+    feedbackMessage.innerText = "Congratulations! You've achieved your milestone!";
+    celebrationContainer.style.display = "inline-block"; // Show celebration
 
-// Show Confetti Effect
-function showConfetti() {
-    const canvas = document.getElementById('confettiCanvas');
-    const ctx = canvas.getContext('2d');
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const confetti = [];
-
-    function createConfetti() {
-        const particle = {
-            x: Math.random() * canvas.width,
-            y: -10,
-            size: Math.random() * 5 + 5,
-            speed: Math.random() * 3 + 1,
-            angle: Math.random() * 2 * Math.PI,
-            color: `hsl(${Math.random() * 360}, 100%, 50%)`
-        };
-        confetti.push(particle);
-    }
-
-    for (let i = 0; i < 100; i++) {
-        createConfetti();
-    }
-
-    function animateConfetti() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        confetti.forEach((particle, index) => {
-            particle.y += particle.speed;
-            particle.x += Math.sin(particle.angle) * 2;
-
-            ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-            ctx.fillStyle = particle.color;
-            ctx.fill();
-
-            if (particle.y > canvas.height) {
-                confetti.splice(index, 1);
-            }
-        });
-
-        if (confetti.length > 0) {
-            requestAnimationFrame(animateConfetti);
-        }
-    }
-
-    animateConfetti();
+    setTimeout(() => {
+        document.getElementById("feedback-container").style.display = "none";
+    }, 3000);
 }
 
 // Event Listeners
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
 document.getElementById("setMilestone").addEventListener("click", setMilestone);
+document.getElementById("clearMilestones").addEventListener("click", clearMilestones);
 
-renderTransactions();  // Initial render for transactions and milestone charts
+// Initial Render
+renderTransactions();
+renderMilestoneList();
