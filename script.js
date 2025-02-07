@@ -20,6 +20,9 @@ function addTransaction(event) {
     transactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
+    // Update the spent amount for the respective category
+    updateSpentAmount(category, amount, type);
+    
     renderTransactions();
     document.getElementById("transaction-form").reset();
 }
@@ -42,9 +45,29 @@ function renderTransactions(filteredTransactions = transactions) {
 
 // Delete Transaction
 function deleteTransaction(index) {
+    const transaction = transactions[index];
     transactions.splice(index, 1);
     localStorage.setItem("transactions", JSON.stringify(transactions));
+
+    // Update the spent amount for the respective category when deleting a transaction
+    updateSpentAmount(transaction.category, transaction.amount, transaction.type === 'expense' ? 'income' : 'expense');
+    
     renderTransactions();
+}
+
+// Update Spent Amount for Category
+function updateSpentAmount(category, amount, type) {
+    const budget = budgets.find(b => b.category === category);
+    if (!budget) return;
+
+    if (type === 'expense') {
+        budget.spent += amount;
+    } else if (type === 'income') {
+        budget.spent -= amount; // reduce the spent if it's income
+    }
+
+    localStorage.setItem("budgets", JSON.stringify(budgets));
+    renderBudgetList();
 }
 
 // Calculate Summary
@@ -56,52 +79,6 @@ function calculateSummary() {
     document.getElementById("totalIncome").innerText = totalIncome;
     document.getElementById("totalExpense").innerText = totalExpense;
     document.getElementById("balanceLeft").innerText = balanceLeft;
-}
-
-// Render Charts
-function renderCharts() {
-    const ctx = document.getElementById("transactionChart").getContext("2d");
-
-    if (transactionChart !== null) {
-        transactionChart.destroy();
-    }
-
-    const labels = transactions.map(t => t.description);
-    const incomeData = transactions.map(t => t.type === "income" ? t.amount : 0);
-    const expenseData = transactions.map(t => t.type === "expense" ? t.amount : 0);
-
-    transactionChart = new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: labels,
-            datasets: [
-                { label: "Income", data: incomeData, fill: false, borderColor: "green", tension: 0.1 },
-                { label: "Expense", data: expenseData, fill: false, borderColor: "red", tension: 0.1 }
-            ]
-        }
-    });
-}
-
-// Set Budget
-function setBudget() {
-    const category = document.getElementById("budget-category").value;
-    const amount = parseFloat(document.getElementById("budget-amount").value);
-
-    if (isNaN(amount) || amount <= 0) {
-        alert("Please enter a valid budget amount.");
-        return;
-    }
-
-    const existingBudget = budgets.find(b => b.category === category);
-    if (existingBudget) {
-        existingBudget.amount = amount;
-        existingBudget.spent = 0;
-    } else {
-        budgets.push({ category, amount, spent: 0 });
-    }
-
-    localStorage.setItem("budgets", JSON.stringify(budgets));
-    renderBudgetList();
 }
 
 // Render Budget List with Progress Bars
@@ -127,6 +104,30 @@ function renderBudgetList() {
     });
 }
 
+// Set Budget
+function setBudget() {
+    const category = document.getElementById("budget-category").value;
+    const amount = parseFloat(document.getElementById("budget-amount").value);
+
+    if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid budget amount.");
+        return;
+    }
+
+    // Check if the category already has a budget
+    const existingBudget = budgets.find(b => b.category === category);
+    if (existingBudget) {
+        existingBudget.amount = amount; // Update existing budget
+        existingBudget.spent = 0; // Reset spent amount when updating budget
+    } else {
+        budgets.push({ category, amount, spent: 0 });
+    }
+
+    localStorage.setItem("budgets", JSON.stringify(budgets));
+    renderBudgetList();
+}
+
+// Filter and Display Budgets
 document.getElementById("set-budget").addEventListener("click", setBudget);
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
 
