@@ -65,3 +65,13 @@ button:hover {
     max-width: 600px;
     margin: 20px auto;
 }
+
+#celebration-container {
+    text-align: center;
+    font-size: 24px;
+    color: green;
+    padding: 20px;
+    background: lightgreen;
+    border-radius: 10px;
+    margin-top: 20px;
+}
