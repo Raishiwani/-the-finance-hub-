@@ -20,7 +20,7 @@ function addTransaction(event) {
     transactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
-    // Update the spent amount for the respective category
+    // Update spent amount for category
     updateSpentAmount(category, amount, type);
     
     renderTransactions();
@@ -28,11 +28,11 @@ function addTransaction(event) {
 }
 
 // Render Transactions
-function renderTransactions(filteredTransactions = transactions) {
+function renderTransactions() {
     const transactionList = document.getElementById('transactions');
     transactionList.innerHTML = "";
 
-    filteredTransactions.forEach((transaction, index) => {
+    transactions.forEach((transaction, index) => {
         const li = document.createElement('li');
         li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
         <button onclick="deleteTransaction(${index})">Delete</button>`;
@@ -40,7 +40,7 @@ function renderTransactions(filteredTransactions = transactions) {
     });
 
     calculateSummary();
-    renderCharts();
+    renderBudgetList();
 }
 
 // Delete Transaction
@@ -49,7 +49,7 @@ function deleteTransaction(index) {
     transactions.splice(index, 1);
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
-    // Update the spent amount for the respective category when deleting a transaction
+    // Update spent amount when deleting transaction
     updateSpentAmount(transaction.category, transaction.amount, transaction.type === 'expense' ? 'income' : 'expense');
     
     renderTransactions();
@@ -63,22 +63,34 @@ function updateSpentAmount(category, amount, type) {
     if (type === 'expense') {
         budget.spent += amount;
     } else if (type === 'income') {
-        budget.spent -= amount; // reduce the spent if it's income
+        budget.spent -= amount; // reduce spent if it's income
     }
 
     localStorage.setItem("budgets", JSON.stringify(budgets));
     renderBudgetList();
 }
 
-// Calculate Summary
-function calculateSummary() {
-    const totalIncome = transactions.reduce((acc, t) => t.type === "income" ? acc + t.amount : acc, 0);
-    const totalExpense = transactions.reduce((acc, t) => t.type === "expense" ? acc + t.amount : acc, 0);
-    const balanceLeft = totalIncome - totalExpense;
+// Set Budget
+function setBudget() {
+    const category = document.getElementById("budget-category").value;
+    const amount = parseFloat(document.getElementById("budget-amount").value);
 
-    document.getElementById("totalIncome").innerText = totalIncome;
-    document.getElementById("totalExpense").innerText = totalExpense;
-    document.getElementById("balanceLeft").innerText = balanceLeft;
+    if (isNaN(amount) || amount <= 0) {
+        alert("Please enter a valid budget amount.");
+        return;
+    }
+
+    // Check if the category already has a budget
+    const existingBudget = budgets.find(b => b.category === category);
+    if (existingBudget) {
+        existingBudget.amount = amount;
+        existingBudget.spent = 0; // reset spent
+    } else {
+        budgets.push({ category, amount, spent: 0 });
+    }
+
+    localStorage.setItem("budgets", JSON.stringify(budgets));
+    renderBudgetList();
 }
 
 // Render Budget List with Progress Bars
@@ -104,30 +116,7 @@ function renderBudgetList() {
     });
 }
 
-// Set Budget
-function setBudget() {
-    const category = document.getElementById("budget-category").value;
-    const amount = parseFloat(document.getElementById("budget-amount").value);
-
-    if (isNaN(amount) || amount <= 0) {
-        alert("Please enter a valid budget amount.");
-        return;
-    }
-
-    // Check if the category already has a budget
-    const existingBudget = budgets.find(b => b.category === category);
-    if (existingBudget) {
-        existingBudget.amount = amount; // Update existing budget
-        existingBudget.spent = 0; // Reset spent amount when updating budget
-    } else {
-        budgets.push({ category, amount, spent: 0 });
-    }
-
-    localStorage.setItem("budgets", JSON.stringify(budgets));
-    renderBudgetList();
-}
-
-// Filter and Display Budgets
+// Initialize event listeners
 document.getElementById("set-budget").addEventListener("click", setBudget);
 document.getElementById("transaction-form").addEventListener("submit", addTransaction);
 
