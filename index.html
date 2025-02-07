@@ -9,7 +9,7 @@
 <body>
     <header>
         <h1>Personal Finance Management</h1>
-        <p>Track your spending, income, savings, and budgets.</p>
+        <p>Track your spending, income, savings, and transactions.</p>
     </header>
     
     <div class="dashboard-container">
@@ -45,18 +45,13 @@
             </select>
             <button type="submit">Add Transaction</button>
         </form>
-
-        <h2>Set Your Budgets 💰</h2>
-        <form id="budget-form">
-            <input type="text" id="budget-category" placeholder="Category (e.g., Food)">
-            <input type="number" id="budget-amount" placeholder="Budget Amount">
-            <button type="button" id="set-budget">Set Budget</button>
-        </form>
-        
-        <h3>Budgets List 📊</h3>
-        <ul id="budgetList"></ul>
     </div>
 
+    <div id="chart-container">
+        <canvas id="transactionChart"></canvas>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
