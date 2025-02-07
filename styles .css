@@ -1,3 +1,4 @@
+/* General Styles */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -13,7 +14,7 @@ header {
     border-radius: 10px;
 }
 
-.dashboard-container, #milestone-container {
+.dashboard-container, #budget-container {
     background: white;
     padding: 15px;
     margin: 20px auto;
@@ -46,12 +47,12 @@ button:hover {
     background-color: #0056b3;
 }
 
-#transactions, #milestoneList {
+#transactions, #budgetList {
     list-style: none;
     padding: 0;
 }
 
-#transactions li, #milestoneList li {
+#transactions li, #budgetList li {
     background: #e9ecef;
     margin: 5px 0;
     padding: 10px;
@@ -66,27 +67,24 @@ button:hover {
     margin: 20px auto;
 }
 
-#feedback-container {
-    background: #fff5e1;
-    padding: 15px;
-    text-align: center;
-    margin: 20px auto;
-    width: 80%;
-    border-radius: 8px;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+.progress-bar {
+    width: 100%;
+    background-color: #f4f4f4;
+    border-radius: 10px;
+    margin-bottom: 10px;
 }
 
-#celebration-container {
-    display: inline-block;
-    width: 50px;
-    height: 50px;
-    background-color: gold;
-    border-radius: 50%;
-    animation: confetti 2s infinite;
+.progress-bar div {
+    height: 20px;
+    border-radius: 10px;
 }
 
-@keyframes confetti {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(30px); }
-    100% { transform: translateY(0); }
+#budgetList li {
+    list-style: none;
+    padding: 10px;
+    margin-bottom: 5px;
+    background-color: #e9ecef;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
