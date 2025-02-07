@@ -100,6 +100,7 @@ function setMilestone() {
     localStorage.setItem("milestones", JSON.stringify(milestones));
 
     renderMilestoneChart();
+    checkMilestoneAchievements();
 }
 
 // Render Milestone Chart
@@ -124,6 +125,21 @@ function renderMilestoneChart() {
             ]
         }
     });
+}
+
+// Check Milestone Achievements
+function checkMilestoneAchievements() {
+    milestones.forEach((milestone, index) => {
+        if (milestone.saved >= milestone.amount) {
+            document.getElementById('celebration-container').style.display = 'block';
+            showConfetti();
+        }
+    });
+}
+
+// Show confetti when milestone is reached
+function showConfetti() {
+    canvasConfetti();
 }
 
 // Search Transactions
