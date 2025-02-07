@@ -20,6 +20,8 @@ function addTransaction(event) {
 
     const transaction = { description, amount, type, category, date: new Date().toLocaleDateString() };
     transactions.push(transaction);
+
+    // Save data to localStorage
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
     renderTransactions();
@@ -45,7 +47,7 @@ function renderTransactions(filteredTransactions = transactions) {
 // Delete Transaction
 function deleteTransaction(index) {
     transactions.splice(index, 1);
-    localStorage.setItem("transactions", JSON.stringify(transactions));
+    localStorage.setItem("transactions", JSON.stringify(transactions)); // Re-save to localStorage
     renderTransactions();
 }
 
@@ -97,6 +99,8 @@ function setMilestone() {
     }
 
     milestones.push({ description, amount, saved: 0 });
+
+    // Save data to localStorage
     localStorage.setItem("milestones", JSON.stringify(milestones));
 
     renderMilestoneChart();
@@ -153,6 +157,6 @@ document.getElementById("transaction-form").addEventListener("submit", addTransa
 document.getElementById("setMilestone").addEventListener("click", setMilestone);
 document.getElementById("search").addEventListener("input", searchTransactions);
 
-// Initial render
+// Initial render to ensure data is loaded from localStorage
 renderTransactions();
 renderMilestoneChart();
