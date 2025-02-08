@@ -3,69 +3,121 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Finance Hub</title>
+    <title>Personal Finance Management</title>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .summary {
+            background: #fff;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            margin: 5px;
+            padding: 8px;
+            font-size: 14px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #fff;
+            margin: 5px 0;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Personal Finance Management</h1>
-        <p>Track your spending, income, savings, and milestones.</p>
-    </header>
-    
-    <div class="dashboard-container">
-        <div id="summary">
-            <div>Total Income: 💰 <span id="totalIncome">0</span></div>
-            <div>Total Expenses: 💸 <span id="totalExpense">0</span></div>
-            <div>Balance Left: 💵 <span id="balanceLeft">0</span></div>
-        </div>
+    <h1>💰 Personal Finance Management</h1>
+    <p>Track your spending, income, savings, and transactions.</p>
 
-        <h2>Transaction List 📋</h2>
-        <input type="text" id="search" placeholder="Search transactions...">
-        <select id="filterCategory">
-            <option value="all">All Categories</option>
-            <option value="food">Food 🍔</option>
-            <option value="rent">Rent 🏠</option>
-            <option value="salary">Salary 💼</option>
-            <option value="others">Others 🔄</option>
-        </select>
-        <ul id="transactions"></ul>
-
-        <form id="transaction-form">
-            <input type="text" id="description" required placeholder="Description">
-            <input type="number" id="amount" required placeholder="Amount">
-            <select id="category">
-                <option value="food">Food 🍔</option>
-                <option value="rent">Rent 🏠</option>
-                <option value="salary">Salary 💼</option>
-                <option value="others">Others 🔄</option>
-            </select>
-            <select id="type">
-                <option value="income">Income 💰</option>
-                <option value="expense">Expense 💸</option>
-            </select>
-            <button type="submit">Add Transaction</button>
-        </form>
+    <!-- Summary Section -->
+    <div class="summary">
+        <p>Total Income: <span id="totalIncome">0</span></p>
+        <p>Total Expenses: <span id="totalExpenses">0</span></p>
+        <p>Balance Left: <span id="balanceLeft">0</span></p>
     </div>
 
-    <div id="chart-container">
-        <canvas id="transactionChart"></canvas>
-    </div>
+    <!-- Transaction Section -->
+    <h2>📜 Transaction List</h2>
+    <input type="text" id="searchTransaction" placeholder="Search transactions...">
+    <select id="filterCategory">
+        <option value="all">All Categories</option>
+        <option value="Food">Food 🍔</option>
+        <option value="Rent">Rent 🏠</option>
+        <option value="Entertainment">Entertainment 🎬</option>
+        <option value="salary">Salary 💼</option>
+        <option value="others">Others 🔄</option>
+    </select>
 
-    <footer>
-        <a href="feedback.html">Give Feedback</a>
-    </footer>
+    <ul id="transactionList"></ul>
 
-    <!-- Feedback Modal -->
-    <div id="feedbackModal" style="display: none;">
-        <div id="feedbackContainer">
-            <h3>We value your feedback! 💬</h3>
-            <textarea id="feedbackText" placeholder="Enter your feedback here..."></textarea>
-            <button onclick="submitFeedback()">Submit Feedback</button>
-            <button onclick="closeFeedbackModal()">Close</button>
-        </div>
-    </div>
+    <!-- Add Transaction -->
+    <h3>Add a Transaction</h3>
+    <input type="text" id="description" placeholder="Description">
+    <input type="number" id="amount" placeholder="Amount">
+    <select id="category">
+        <option value="Food">Food 🍔</option>
+        <option value="Rent">Rent 🏠</option>
+        <option value="Entertainment">Entertainment 🎬</option>
+        <option value="salary">Salary 💼</option>
+        <option value="others">Others 🔄</option>
+    </select>
+    <select id="type">
+        <option value="income">Income 💰</option>
+        <option value="expense">Expense 💸</option>
+    </select>
+    <button id="addTransaction">Add Transaction</button>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="script.js"></script>
+    <!-- Feedback Section -->
+    <h2>💬 Feedback</h2>
+    <input type="text" id="userName" placeholder="Your Name">
+    <input type="text" id="userFeedback" placeholder="Your Feedback">
+    <button id="submitFeedback">Submit</button>
+    <ul id="feedbackList"></ul>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const transactionList = document.getElementById("transactionList");
+            const feedbackList = document.getElementById("feedbackList");
+            
+            document.getElementById("addTransaction").addEventListener("click", function () {
+                const desc = document.getElementById("description").value;
+                const amount = document.getElementById("amount").value;
+                const category = document.getElementById("category").value;
+                const type = document.getElementById("type").value;
+                
+                if (desc && amount) {
+                    const transactionItem = document.createElement("li");
+                    transactionItem.textContent = `${new Date().toLocaleDateString()} - ${desc} - ₹${amount} (${type})`;
+                    transactionList.appendChild(transactionItem);
+                }
+            });
+            
+            document.getElementById("submitFeedback").addEventListener("click", function () {
+                const userName = document.getElementById("userName").value;
+                const userFeedback = document.getElementById("userFeedback").value;
+                
+                if (userName && userFeedback) {
+                    const feedbackItem = document.createElement("li");
+                    feedbackItem.textContent = `${userName}: ${userFeedback}`;
+                    feedbackList.appendChild(feedbackItem);
+                }
+            });
+        });
+    </script>
 </body>
 </html>
