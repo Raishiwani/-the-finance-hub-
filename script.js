@@ -1,96 +1,96 @@
-// Retrieve data from localStorage
+document.addEventListener("DOMContentLoaded", () => {
+    loadTransactions();
+});
+
+// Transaction Data Storage
 let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-let transactionChart = null;
 
 // Add Transaction
-function addTransaction(event) {
-    event.preventDefault();
-    
-    const description = document.getElementById("description").value.trim();
-    const amount = parseFloat(document.getElementById("amount").value);
-    const type = document.getElementById("type").value;
-    const category = document.getElementById("category").value;
+document.getElementById("addTransaction").addEventListener("click", () => {
+    let desc = document.getElementById("description").value;
+    let amount = parseFloat(document.getElementById("amount").value);
+    let type = document.getElementById("type").value;
 
-    if (description === "" || isNaN(amount)) {
-        alert("Please enter a valid description and amount.");
+    if (desc === "" || isNaN(amount)) {
+        alert("Please enter valid details.");
         return;
     }
 
-    const transaction = { description, amount, type, category, date: new Date().toLocaleDateString() };
+    let transaction = { desc, amount, type, date: new Date().toLocaleDateString() };
     transactions.push(transaction);
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
-    renderTransactions();
-    document.getElementById("transaction-form").reset();
+    updateTransactions();
+    updateChart();
+});
+
+// Load Transactions
+function loadTransactions() {
+    updateTransactions();
+    updateChart();
 }
 
-// Render Transactions
-function renderTransactions(filteredTransactions = transactions) {
-    const transactionList = document.getElementById('transactions');
-    transactionList.innerHTML = "";
-
-    filteredTransactions.forEach((transaction, index) => {
-        const li = document.createElement('li');
-        li.innerHTML = `${transaction.description}: ₹${transaction.amount} (${transaction.category}) 
-        <button onclick="deleteTransaction(${index})">Delete</button>`;
-        transactionList.appendChild(li);
+// Update Transaction List
+function updateTransactions() {
+    let transactionsList = document.getElementById("transactions");
+    transactionsList.innerHTML = "";
+    
+    transactions.forEach((transaction, index) => {
+        let li = document.createElement("li");
+        li.innerHTML = `
+            <span>${transaction.date} - ${transaction.desc} - ₹${transaction.amount} (${transaction.type})</span>
+            <button onclick="deleteTransaction(${index})">❌</button>
+        `;
+        transactionsList.appendChild(li);
     });
-
-    calculateSummary();
-    renderCharts();
 }
 
 // Delete Transaction
 function deleteTransaction(index) {
     transactions.splice(index, 1);
     localStorage.setItem("transactions", JSON.stringify(transactions));
-    renderTransactions();
+    updateTransactions();
+    updateChart();
 }
 
-// Calculate Summary
-function calculateSummary() {
-    const totalIncome = transactions.reduce((acc, t) => t.type === "income" ? acc + t.amount : acc, 0);
-    const totalExpense = transactions.reduce((acc, t) => t.type === "expense" ? acc + t.amount : acc, 0);
-    const balanceLeft = totalIncome - totalExpense;
+// Chart Implementation
+function updateChart() {
+    let ctx = document.getElementById("expenseChart").getContext("2d");
+    let income = transactions.filter(t => t.type === "income").reduce((sum, t) => sum + t.amount, 0);
+    let expenses = transactions.filter(t => t.type === "expense").reduce((sum, t) => sum + t.amount, 0);
 
-    document.getElementById("totalIncome").innerText = totalIncome;
-    document.getElementById("totalExpense").innerText = totalExpense;
-    document.getElementById("balanceLeft").innerText = balanceLeft;
-}
-
-// Render Charts
-function renderCharts() {
-    const ctx = document.getElementById("transactionChart").getContext("2d");
-
-    if (transactionChart !== null) {
-        transactionChart.destroy();
-    }
-
-    const labels = transactions.map(t => t.description);
-    const incomeData = transactions.map(t => t.type === "income" ? t.amount : 0);
-    const expenseData = transactions.map(t => t.type === "expense" ? t.amount : 0);
-
-    transactionChart = new Chart(ctx, {
+    new Chart(ctx, {
         type: "line",
         data: {
-            labels: labels,
-            datasets: [
-                { label: "Income", data: incomeData, fill: false, borderColor: "green", tension: 0.1 },
-                { label: "Expense", data: expenseData, fill: false, borderColor: "red", tension: 0.1 }
-            ]
+            labels: ["Income", "Expenses"],
+            datasets: [{
+                label: "Transaction Summary",
+                data: [income, expenses],
+                backgroundColor: ["green", "red"],
+                borderColor: ["green", "red"],
+                borderWidth: 2
+            }]
         }
     });
 }
 
-// Search Transactions
-document.getElementById('search').addEventListener('input', function() {
-    const searchText = this.value.toLowerCase();
-    const filteredTransactions = transactions.filter(t => t.description.toLowerCase().includes(searchText));
-    renderTransactions(filteredTransactions);
+// Feedback Feature
+document.getElementById("submitFeedback").addEventListener("click", () => {
+    let feedback = document.getElementById("feedbackText").value;
+    if (feedback.trim() === "") {
+        alert("Please enter feedback.");
+        return;
+    }
+
+    alert("Thank you for your feedback!");
+    document.getElementById("feedbackModal").style.display = "none";
 });
 
-// Add event listeners
-document.getElementById("transaction-form").addEventListener("submit", addTransaction);
+document.getElementById("closeFeedback").addEventListener("click", () => {
+    document.getElementById("feedbackModal").style.display = "none";
+});
 
-// Initial rendering
-renderTransactions();
+// Open Feedback Modal
+document.getElementById("openFeedback").addEventListener("click", () => {
+    document.getElementById("feedbackModal").style.display = "flex";
+});
