@@ -9,7 +9,7 @@
 <body>
     <header>
         <h1>Personal Finance Management</h1>
-        <p>Track your spending, income, savings, and transactions.</p>
+        <p>Track your spending, income, savings, and milestones.</p>
     </header>
     
     <div class="dashboard-container">
@@ -49,6 +49,20 @@
 
     <div id="chart-container">
         <canvas id="transactionChart"></canvas>
+    </div>
+
+    <footer>
+        <a href="feedback.html">Give Feedback</a>
+    </footer>
+
+    <!-- Feedback Modal -->
+    <div id="feedbackModal" style="display: none;">
+        <div id="feedbackContainer">
+            <h3>We value your feedback! 💬</h3>
+            <textarea id="feedbackText" placeholder="Enter your feedback here..."></textarea>
+            <button onclick="submitFeedback()">Submit Feedback</button>
+            <button onclick="closeFeedbackModal()">Close</button>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
