@@ -1,96 +1,98 @@
+let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
+let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || [];
+
 document.addEventListener("DOMContentLoaded", () => {
-    loadTransactions();
+    updateTransactions();
+    updateFeedback();
 });
 
-// Transaction Data Storage
-let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-
-// Add Transaction
-document.getElementById("addTransaction").addEventListener("click", () => {
-    let desc = document.getElementById("description").value;
+function addTransaction() {
+    let desc = document.getElementById("desc").value;
     let amount = parseFloat(document.getElementById("amount").value);
+    let category = document.getElementById("category").value;
     let type = document.getElementById("type").value;
 
-    if (desc === "" || isNaN(amount)) {
-        alert("Please enter valid details.");
+    if (!desc || isNaN(amount)) {
+        alert("Please enter a valid description and amount!");
         return;
     }
 
-    let transaction = { desc, amount, type, date: new Date().toLocaleDateString() };
-    transactions.push(transaction);
+    transactions.push({ desc, amount, category, type, date: new Date().toLocaleDateString() });
     localStorage.setItem("transactions", JSON.stringify(transactions));
 
     updateTransactions();
-    updateChart();
-});
-
-// Load Transactions
-function loadTransactions() {
-    updateTransactions();
-    updateChart();
 }
 
-// Update Transaction List
 function updateTransactions() {
     let transactionsList = document.getElementById("transactions");
     transactionsList.innerHTML = "";
-    
+
+    let totalIncome = 0, totalExpenses = 0;
+
     transactions.forEach((transaction, index) => {
         let li = document.createElement("li");
-        li.innerHTML = `
-            <span>${transaction.date} - ${transaction.desc} - ₹${transaction.amount} (${transaction.type})</span>
-            <button onclick="deleteTransaction(${index})">❌</button>
-        `;
+        li.innerHTML = `${transaction.date} - ${transaction.desc} - ₹${transaction.amount} (${transaction.type}) 
+                        <button class="delete" onclick="deleteTransaction(${index})">❌</button>`;
         transactionsList.appendChild(li);
+
+        if (transaction.type === "income") totalIncome += transaction.amount;
+        else totalExpenses += transaction.amount;
     });
+
+    document.getElementById("totalIncome").textContent = totalIncome;
+    document.getElementById("totalExpenses").textContent = totalExpenses;
+    document.getElementById("balance").textContent = totalIncome - totalExpenses;
 }
 
-// Delete Transaction
 function deleteTransaction(index) {
     transactions.splice(index, 1);
     localStorage.setItem("transactions", JSON.stringify(transactions));
     updateTransactions();
-    updateChart();
 }
 
-// Chart Implementation
-function updateChart() {
-    let ctx = document.getElementById("expenseChart").getContext("2d");
-    let income = transactions.filter(t => t.type === "income").reduce((sum, t) => sum + t.amount, 0);
-    let expenses = transactions.filter(t => t.type === "expense").reduce((sum, t) => sum + t.amount, 0);
+// Search Transactions
+document.getElementById("search").addEventListener("input", function () {
+    let filter = this.value.toLowerCase();
+    let filteredTransactions = transactions.filter(t => t.desc.toLowerCase().includes(filter));
+    displayFilteredTransactions(filteredTransactions);
+});
 
-    new Chart(ctx, {
-        type: "line",
-        data: {
-            labels: ["Income", "Expenses"],
-            datasets: [{
-                label: "Transaction Summary",
-                data: [income, expenses],
-                backgroundColor: ["green", "red"],
-                borderColor: ["green", "red"],
-                borderWidth: 2
-            }]
-        }
+function displayFilteredTransactions(filteredTransactions) {
+    let transactionsList = document.getElementById("transactions");
+    transactionsList.innerHTML = "";
+
+    filteredTransactions.forEach((transaction, index) => {
+        let li = document.createElement("li");
+        li.innerHTML = `${transaction.date} - ${transaction.desc} - ₹${transaction.amount} (${transaction.type}) 
+                        <button class="delete" onclick="deleteTransaction(${index})">❌</button>`;
+        transactionsList.appendChild(li);
     });
 }
 
-// Feedback Feature
-document.getElementById("submitFeedback").addEventListener("click", () => {
-    let feedback = document.getElementById("feedbackText").value;
-    if (feedback.trim() === "") {
-        alert("Please enter feedback.");
+// Feedback Submission
+document.getElementById("feedbackForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    
+    let name = document.getElementById("name").value;
+    let message = document.getElementById("message").value;
+    
+    if (!name || !message) {
+        alert("Please enter your name and feedback!");
         return;
     }
-
-    alert("Thank you for your feedback!");
-    document.getElementById("feedbackModal").style.display = "none";
+    
+    feedbacks.push({ name, message });
+    localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
+    updateFeedback();
 });
 
-document.getElementById("closeFeedback").addEventListener("click", () => {
-    document.getElementById("feedbackModal").style.display = "none";
-});
+function updateFeedback() {
+    let feedbackList = document.getElementById("feedbackList");
+    feedbackList.innerHTML = "";
 
-// Open Feedback Modal
-document.getElementById("openFeedback").addEventListener("click", () => {
-    document.getElementById("feedbackModal").style.display = "flex";
-});
+    feedbacks.forEach((feedback) => {
+        let li = document.createElement("li");
+        li.innerHTML = `<strong>${feedback.name}</strong>: ${feedback.message}`;
+        feedbackList.appendChild(li);
+    });
+}
