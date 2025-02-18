@@ -27,13 +27,6 @@ body {
     margin-bottom: 10px;
 }
 
-.search-filter-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-}
-
 .filter-buttons {
     display: inline-block;
     margin-left: 10px;
@@ -62,4 +55,27 @@ body {
 #status-message {
     font-size: 16px;
     font-weight: bold;
+}
+
+/* Feedback Section */
+#feedback-section {
+    margin-top: 20px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.feedback-item {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.feedback-item:last-child {
+    border-bottom: none;
+}
+
+.feedback-item p {
+    margin: 5px 0;
 }
