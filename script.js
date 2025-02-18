@@ -1,127 +1,152 @@
-// Selecting the necessary elements
-const totalIncomeElement = document.getElementById("total-income");
-const totalExpensesElement = document.getElementById("total-expenses");
-const balanceLeftElement = document.getElementById("balance");
-const transactionList = document.getElementById("transaction-list");
-const addTransactionBtn = document.getElementById("add-transaction");
-const descriptionInput = document.getElementById("description");
-const amountInput = document.getElementById("amount");
-const categoryInput = document.getElementById("category");
-const typeInput = document.getElementById("type");
-const feedbackList = document.getElementById("feedback-list");
-const submitFeedbackBtn = document.getElementById("submit-feedback");
-const nameInput = document.getElementById("name");
-const feedbackInput = document.getElementById("feedback");
-const searchInput = document.getElementById("search");
+document.addEventListener("DOMContentLoaded", function () {
+    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
 
-// Load transactions from localStorage
-function loadTransactions() {
-    return JSON.parse(localStorage.getItem("transactions")) || [];
-}
+    const incomeDisplay = document.getElementById("total-income");
+    const expenseDisplay = document.getElementById("total-expenses");
+    const balanceDisplay = document.getElementById("balance-left");
+    const transactionList = document.getElementById("transaction-list");
+    const searchInput = document.getElementById("search");
+    const statusEmoji = document.getElementById("financial-status");
+    const statusMessage = document.getElementById("status-message");
 
-// Save transactions to localStorage
-function saveTransactions(transactions) {
-    localStorage.setItem("transactions", JSON.stringify(transactions));
-}
+    document.getElementById("add-transaction").addEventListener("click", function () {
+        const description = document.getElementById("description").value.trim();
+        const amount = parseFloat(document.getElementById("amount").value);
+        const category = document.getElementById("category").value;
+        const type = document.getElementById("type").value;
 
-// Update total income, expenses, and balance
-function updateSummary() {
-    let totalIncome = 0;
-    let totalExpenses = 0;
-    
-    const transactions = loadTransactions();
-    transactions.forEach(transaction => {
-        if (transaction.type === "income") {
-            totalIncome += transaction.amount;
-        } else {
-            totalExpenses += transaction.amount;
+        if (description === "" || isNaN(amount) || amount <= 0) {
+            alert("Please enter valid transaction details.");
+            return;
+        }
+
+        const transaction = {
+            id: Date.now(),
+            description,
+            amount,
+            category,
+            type,
+            date: new Date().toISOString()
+        };
+
+        transactions.push(transaction);
+        localStorage.setItem("transactions", JSON.stringify(transactions));
+        updateUI();
+        document.getElementById("description").value = "";
+        document.getElementById("amount").value = "";
+    });
+
+    function updateUI() {
+        let totalIncome = 0;
+        let totalExpense = 0;
+        transactionList.innerHTML = "";
+
+        transactions.forEach(transaction => {
+            if (transaction.type === "Income") {
+                totalIncome += transaction.amount;
+            } else {
+                totalExpense += transaction.amount;
+            }
+
+            const listItem = document.createElement("li");
+            listItem.classList.add("transaction-item");
+            listItem.innerHTML = `
+                ${transaction.description} - ₹${transaction.amount} (${transaction.type}) 
+                <button class="delete-btn" data-id="${transaction.id}">❌</button>`;
+            transactionList.appendChild(listItem);
+        });
+
+        const balance = totalIncome - totalExpense;
+        incomeDisplay.textContent = `₹${totalIncome}`;
+        expenseDisplay.textContent = `₹${totalExpense}`;
+        balanceDisplay.textContent = `₹${balance}`;
+
+        updateEmojiStatus(balance, totalIncome);
+    }
+
+    transactionList.addEventListener("click", function (event) {
+        if (event.target.classList.contains("delete-btn")) {
+            const id = parseInt(event.target.getAttribute("data-id"));
+            transactions = transactions.filter(transaction => transaction.id !== id);
+            localStorage.setItem("transactions", JSON.stringify(transactions));
+            updateUI();
         }
     });
-    
-    const balance = totalIncome - totalExpenses;
-    
-    totalIncomeElement.textContent = `₹ ${totalIncome}`;
-    totalExpensesElement.textContent = `₹ ${totalExpenses}`;
-    balanceLeftElement.textContent = `₹ ${balance}`;
-}
 
-// Render transactions
-function renderTransactions(filter = "") {
-    transactionList.innerHTML = "";
-    const transactions = loadTransactions();
-    transactions.filter(transaction => 
-        transaction.description.toLowerCase().includes(filter.toLowerCase())
-    ).forEach((transaction, index) => {
-        const listItem = document.createElement("li");
-        listItem.textContent = `${transaction.description} - ₹${transaction.amount} (${transaction.type})`;
+    function updateEmojiStatus(balance, totalIncome) {
+        const percentage = (balance / totalIncome) * 100;
+        let emoji = '';
+        let message = '';
         
-        // Delete button
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "❌";
-        deleteBtn.style.marginLeft = "10px";
-        deleteBtn.onclick = () => deleteTransaction(index);
-        
-        listItem.appendChild(deleteBtn);
-        transactionList.appendChild(listItem);
+        if (totalIncome === 0) {
+            emoji = "";
+            message = "Add transactions to see your financial health.";
+        } else if (percentage > 70) {
+            emoji = "😃";
+            message = `Great! You're saving well. Your savings rate is ${percentage.toFixed(2)}%. Keep it up!`;
+        } else if (percentage > 30) {
+            emoji = "😐";
+            message = `Manage your expenses wisely. Your savings rate is ${percentage.toFixed(2)}%. You can still save more!`;
+        } else {
+            emoji = "😞";
+            message = `Caution! Your balance is running low. Your savings rate is only ${percentage.toFixed(2)}%. Focus on reducing expenses.`;
+        }
+
+        statusEmoji.innerHTML = emoji;
+        statusMessage.textContent = message;
+    }
+
+    searchInput.addEventListener("input", function () {
+        const query = searchInput.value.toLowerCase();
+        transactionList.innerHTML = "";
+
+        transactions.filter(transaction =>
+            transaction.description.toLowerCase().includes(query)
+        ).forEach(transaction => {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `
+                ${transaction.description} - ₹${transaction.amount} (${transaction.type}) 
+                <button class="delete-btn" data-id="${transaction.id}">❌</button>`;
+            transactionList.appendChild(listItem);
+        });
     });
-}
 
-// Add a transaction
-function addTransaction() {
-    const description = descriptionInput.value.trim();
-    const amount = parseFloat(amountInput.value);
-    const category = categoryInput.value;
-    const type = typeInput.value;
-    
-    if (!description || isNaN(amount) || amount <= 0) {
-        alert("Please enter valid details.");
-        return;
+    document.querySelector(".filter-buttons").addEventListener("click", function (event) {
+        if (!event.target.matches("button")) return;
+        filterTransactions(event.target.dataset.filter);
+    });
+
+    function filterTransactions(period) {
+        const now = new Date();
+        let filteredTransactions = transactions;
+
+        if (period === "daily") {
+            filteredTransactions = transactions.filter(transaction =>
+                new Date(transaction.date).toDateString() === now.toDateString()
+            );
+        } else if (period === "weekly") {
+            const weekAgo = new Date();
+            weekAgo.setDate(now.getDate() - 7);
+            filteredTransactions = transactions.filter(transaction =>
+                new Date(transaction.date) >= weekAgo
+            );
+        } else if (period === "monthly") {
+            const monthAgo = new Date();
+            monthAgo.setMonth(now.getMonth() - 1);
+            filteredTransactions = transactions.filter(transaction =>
+                new Date(transaction.date) >= monthAgo
+            );
+        }
+
+        transactionList.innerHTML = "";
+        filteredTransactions.forEach(transaction => {
+            const listItem = document.createElement("li");
+            listItem.innerHTML = `
+                ${transaction.description} - ₹${transaction.amount} (${transaction.type}) 
+                <button class="delete-btn" data-id="${transaction.id}">❌</button>`;
+            transactionList.appendChild(listItem);
+        });
     }
-    
-    const transactions = loadTransactions();
-    transactions.push({ description, amount, category, type });
-    saveTransactions(transactions);
-    
-    updateSummary();
-    renderTransactions();
-    
-    descriptionInput.value = "";
-    amountInput.value = "";
-}
 
-// Delete a transaction (one-time deletion)
-function deleteTransaction(index) {
-    let transactions = loadTransactions();
-    transactions.splice(index, 1);
-    saveTransactions(transactions);
-    
-    updateSummary();
-    renderTransactions();
-}
-
-// Feedback submission
-function addFeedback() {
-    const name = nameInput.value.trim();
-    const feedback = feedbackInput.value.trim();
-    
-    if (!name || !feedback) {
-        alert("Please enter your name and feedback.");
-        return;
-    }
-    
-    const listItem = document.createElement("li");
-    listItem.textContent = `${name}: ${feedback}`;
-    feedbackList.appendChild(listItem);
-    
-    nameInput.value = "";
-    feedbackInput.value = "";
-}
-
-// Event listeners
-addTransactionBtn.addEventListener("click", addTransaction);
-submitFeedbackBtn.addEventListener("click", addFeedback);
-searchInput.addEventListener("input", () => renderTransactions(searchInput.value));
-
-// Initial load
-updateSummary();
-renderTransactions();
+    updateUI();
+});
