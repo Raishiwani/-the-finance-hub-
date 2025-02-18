@@ -9,25 +9,24 @@
 <body>
     <h1>Personal Finance Management</h1>
     <p>Track your spending, income, savings, and transactions.</p>
-    
+
     <div id="summary">
         <p>Total Income: 💰 <span id="total-income">0</span></p>
         <p>Total Expenses: 💸 <span id="total-expenses">0</span></p>
         <p>Balance Left: 🏢 <span id="balance-left">0</span></p>
     </div>
-    
+
     <h2>Transaction List 📃</h2>
-    <div class="search-filter-container">
-        <input type="text" id="search" placeholder="Search transactions...">
-        <div class="filter-buttons">
-            <button data-filter="daily">Daily</button>
-            <button data-filter="weekly">Weekly</button>
-            <button data-filter="monthly">Monthly</button>
-        </div>
+    <input type="text" id="search" placeholder="Search transactions...">
+
+    <div class="filter-buttons">
+        <button data-filter="daily">Daily</button>
+        <button data-filter="weekly">Weekly</button>
+        <button data-filter="monthly">Monthly</button>
     </div>
-    
+
     <ul id="transaction-list"></ul>
-    
+
     <input type="text" id="description" placeholder="Description">
     <input type="number" id="amount" placeholder="Amount">
     <select id="category">
@@ -43,11 +42,29 @@
         <option value="Expense">Expense 💸</option>
     </select>
     <button id="add-transaction">Add Transaction</button>
-    
+
     <h2>Financial Status 😊😐😞</h2>
-    <div id="financial-status">😐</div>
+    <div id="emoji-status">😐</div>
     <p id="status-message">Your financial health based on the balance percentage.</p>
-    
+
+    <h2>Give Your Feedback</h2>
+    <form id="feedback-form">
+        <label for="rating">Rating:</label>
+        <input type="radio" name="rating" value="5" id="rating-5"> 5
+        <input type="radio" name="rating" value="4" id="rating-4"> 4
+        <input type="radio" name="rating" value="3" id="rating-3"> 3
+        <input type="radio" name="rating" value="2" id="rating-2"> 2
+        <input type="radio" name="rating" value="1" id="rating-1"> 1
+
+        <label for="feedback-comment">Comment:</label>
+        <textarea id="feedback-comment" placeholder="Leave your comment here..."></textarea>
+
+        <button type="button" id="submit-feedback">Submit Feedback</button>
+    </form>
+
+    <h2>Feedbacks</h2>
+    <div id="feedback-section"></div>
+
     <script src="script.js"></script>
 </body>
 </html>
