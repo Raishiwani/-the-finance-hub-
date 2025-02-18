@@ -9,46 +9,45 @@
 <body>
     <h1>Personal Finance Management</h1>
     <p>Track your spending, income, savings, and transactions.</p>
-
-    <div class="summary">
+    
+    <div id="summary">
         <p>Total Income: 💰 <span id="total-income">0</span></p>
         <p>Total Expenses: 💸 <span id="total-expenses">0</span></p>
-        <p>Balance Left: 💶 <span id="balance">0</span></p>
+        <p>Balance Left: 🏢 <span id="balance-left">0</span></p>
     </div>
-
+    
     <h2>Transaction List 📃</h2>
-    <input type="text" id="search" placeholder="Search transactions...">
-    <select id="category-filter">
-        <option value="all">All Categories</option>
-    </select>
-
+    <div class="search-filter-container">
+        <input type="text" id="search" placeholder="Search transactions...">
+        <div class="filter-buttons">
+            <button data-filter="daily">Daily</button>
+            <button data-filter="weekly">Weekly</button>
+            <button data-filter="monthly">Monthly</button>
+        </div>
+    </div>
+    
     <ul id="transaction-list"></ul>
-
-    <div class="transaction-form">
-        <input type="text" id="description" placeholder="Description">
-        <input type="number" id="amount" placeholder="Amount">
-        <select id="category">
-            <option value="Food">Food 🍔</option>
-            <option value="Rent">Rent 🏠</option>
-            <option value="Entertainment">Entertainment 🎬</option>
-            <option value="salary">Salary 💼</option>
-            <option value="others">Others 🔄</option>
-        </select>
-        <select id="type">
-            <option value="income">Income 💰</option>
-            <option value="expense">Expense 💸</option>
-        </select>
-        <button id="add-transaction">Add Transaction</button>
-    </div>
-
-    <h2>Feedback 📝</h2>
-    <div class="feedback-section">
-        <input type="text" id="name" placeholder="Your Name">
-        <input type="text" id="feedback" placeholder="Your Feedback">
-        <button id="submit-feedback">Submit</button>
-    </div>
-    <ul id="feedback-list"></ul>
-
+    
+    <input type="text" id="description" placeholder="Description">
+    <input type="number" id="amount" placeholder="Amount">
+    <select id="category">
+        <option value="salary">Salary 💼</option>
+        <option value="rent">Rent 🏠</option>
+        <option value="food">Food 🍔</option>
+        <option value="entertainment">Entertainment 🎬</option>
+        <option value="transport">Transport 🚗</option>
+        <option value="others">Others 🔄</option>
+    </select>
+    <select id="type">
+        <option value="Income">Income 💰</option>
+        <option value="Expense">Expense 💸</option>
+    </select>
+    <button id="add-transaction">Add Transaction</button>
+    
+    <h2>Financial Status 😊😐😞</h2>
+    <div id="financial-status">😐</div>
+    <p id="status-message">Your financial health based on the balance percentage.</p>
+    
     <script src="script.js"></script>
 </body>
 </html>
