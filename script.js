@@ -1,146 +1,121 @@
-document.addEventListener("DOMContentLoaded", function () {
-    let transactions = JSON.parse(localStorage.getItem("transactions")) || [];
-    let feedbacks = JSON.parse(localStorage.getItem("feedbacks")) || []; // Retrieve feedbacks from localStorage
-
-    const incomeDisplay = document.getElementById("total-income");
-    const expenseDisplay = document.getElementById("total-expenses");
-    const balanceDisplay = document.getElementById("balance-left");
+document.addEventListener("DOMContentLoaded", () => {
+    const totalIncome = document.getElementById("total-income");
+    const totalExpenses = document.getElementById("total-expenses");
+    const balanceLeft = document.getElementById("balance-left");
+    const statusIcon = document.getElementById("status-icon");
+    const statusMessage = document.getElementById("status-message");
     const transactionList = document.getElementById("transaction-list");
     const searchInput = document.getElementById("search");
-    const statusEmoji = document.getElementById("emoji-status");
-    const statusMessage = document.getElementById("status-message");
-    const feedbackSection = document.getElementById("feedback-section");
+    const downloadCsvBtn = document.getElementById("download-csv");
 
-    document.getElementById("add-transaction").addEventListener("click", function () {
+    let transactions = [];
+
+    document.getElementById("add-transaction").addEventListener("click", () => {
         const description = document.getElementById("description").value.trim();
         const amount = parseFloat(document.getElementById("amount").value);
-        const category = document.getElementById("category").value;
         const type = document.getElementById("type").value;
+        const category = document.getElementById("category").value;
 
-        if (description === "" || isNaN(amount) || amount <= 0) {
+        if (!description || isNaN(amount)) {
             alert("Please enter valid transaction details.");
             return;
         }
 
-        const transaction = {
-            id: Date.now(),
-            description,
-            amount,
-            category,
-            type,
-            date: new Date().toISOString()
-        };
-
+        const emoji = getEmoji(description);
+        const transaction = { description, amount, type, category, emoji };
         transactions.push(transaction);
-        localStorage.setItem("transactions", JSON.stringify(transactions));
-        updateUI();
+        updateSummary();
+        displayTransactions();
         document.getElementById("description").value = "";
         document.getElementById("amount").value = "";
     });
 
-    // Add feedback functionality
-    document.getElementById("submit-feedback").addEventListener("click", function () {
-        const rating = parseInt(document.querySelector('input[name="rating"]:checked')?.value);
-        const comment = document.getElementById("feedback-comment").value.trim();
+    function getEmoji(description) {
+        const lowerDesc = description.toLowerCase();
+        if (lowerDesc.includes("food") || lowerDesc.includes("restaurant") || lowerDesc.includes("coffee")) return "🍕";
+        if (lowerDesc.includes("transport") || lowerDesc.includes("bus") || lowerDesc.includes("train") || lowerDesc.includes("uber")) return "🚕";
+        if (lowerDesc.includes("salary") || lowerDesc.includes("income") || lowerDesc.includes("bonus")) return "💰";
+        if (lowerDesc.includes("shopping") || lowerDesc.includes("clothes") || lowerDesc.includes("shoes")) return "🛍️";
+        if (lowerDesc.includes("rent") || lowerDesc.includes("house") || lowerDesc.includes("apartment")) return "🏠";
+        if (lowerDesc.includes("medical") || lowerDesc.includes("hospital") || lowerDesc.includes("medicine")) return "⚕️";
+        if (lowerDesc.includes("entertainment") || lowerDesc.includes("movies") || lowerDesc.includes("netflix")) return "🎬";
+        return "💲";
+    }
 
-        if (!rating || !comment) {
-            alert("Please provide both a rating and a comment.");
+    function updateSummary() {
+        let income = 0, expenses = 0;
+        transactions.forEach(txn => {
+            if (txn.type === "Income") {
+                income += txn.amount;
+            } else {
+                expenses += txn.amount;
+            }
+        });
+
+        const balance = income - expenses;
+        totalIncome.innerText = `💰 ${income.toFixed(2)}`;
+        totalExpenses.innerText = `💸 ${expenses.toFixed(2)}`;
+        balanceLeft.innerText = `🏦 ${balance.toFixed(2)}`;
+
+        updateStatus(balance);
+    }
+
+    function updateStatus(balance) {
+        if (balance > 10000) {
+            statusIcon.innerText = "✔️";
+            statusMessage.innerText = "You're in great financial shape!";
+        } else if (balance > 5000) {
+            statusIcon.innerText = "ℹ️";
+            statusMessage.innerText = "Manage your expenses wisely!";
+        } else {
+            statusIcon.innerText = "⚠️";
+            statusMessage.innerText = "Warning! Your balance is low!";
+        }
+    }
+
+    function displayTransactions(filter = "") {
+        transactionList.innerHTML = "";
+        const filteredTransactions = transactions.filter(txn => txn.description.toLowerCase().includes(filter.toLowerCase()));
+
+        if (filteredTransactions.length === 0) {
+            transactionList.innerHTML = "<p>No transactions found.</p>";
             return;
         }
 
-        const feedback = {
-            id: Date.now(),
-            rating,
-            comment
-        };
-
-        feedbacks.push(feedback);
-        localStorage.setItem("feedbacks", JSON.stringify(feedbacks));
-        displayFeedbacks(); // Display the feedback after it's added
-    });
-
-    // Delete a transaction
-    transactionList.addEventListener("click", function (e) {
-        if (e.target && e.target.classList.contains("delete-btn")) {
-            const transactionId = parseInt(e.target.getAttribute("data-id"));
-            transactions = transactions.filter(transaction => transaction.id !== transactionId);
-            localStorage.setItem("transactions", JSON.stringify(transactions));
-            updateUI();
-        }
-    });
-
-    // Search transactions
-    searchInput.addEventListener("input", function () {
-        const searchTerm = searchInput.value.toLowerCase();
-        updateUI(searchTerm);
-    });
-
-    function updateUI(searchTerm = "") {
-        let totalIncome = 0;
-        let totalExpense = 0;
-        transactionList.innerHTML = "";
-
-        const filteredTransactions = transactions.filter(transaction => {
-            return transaction.description.toLowerCase().includes(searchTerm);
+        filteredTransactions.forEach((txn, index) => {
+            const li = document.createElement("li");
+            li.innerHTML = `${txn.emoji} ${txn.description} - <strong>${txn.type === "Income" ? "💰" : "💸"} ${txn.amount.toFixed(2)}</strong>
+                <button class="delete-btn" onclick="deleteTransaction(${index})">🗑️</button>`;
+            li.classList.add(txn.type === "Income" ? "income" : "expense");
+            transactionList.appendChild(li);
         });
-
-        filteredTransactions.forEach(transaction => {
-            if (transaction.type === "Income") {
-                totalIncome += transaction.amount;
-            } else {
-                totalExpense += transaction.amount;
-            }
-
-            const listItem = document.createElement("li");
-            listItem.classList.add("transaction-item");
-            listItem.innerHTML = `
-                ${transaction.description} - ₹${transaction.amount} (${transaction.type}) 
-                <button class="delete-btn" data-id="${transaction.id}">Delete</button>
-            `;
-            transactionList.appendChild(listItem);
-        });
-
-        incomeDisplay.textContent = totalIncome.toFixed(2);
-        expenseDisplay.textContent = totalExpense.toFixed(2);
-        balanceDisplay.textContent = (totalIncome - totalExpense).toFixed(2);
-
-        const savingsPercentage = (totalIncome - totalExpense) / totalIncome * 100;
-        updateFinancialStatus(savingsPercentage);
     }
 
-    function updateFinancialStatus(savingsPercentage) {
-        let emoji = "😐";
-        let message = `Your savings rate is ${savingsPercentage.toFixed(2)}%.`;
+    window.deleteTransaction = (index) => {
+        transactions.splice(index, 1);
+        updateSummary();
+        displayTransactions();
+    };
 
-        if (savingsPercentage > 70) {
-            emoji = "😃";
-            message = `Great! You are saving well. Your savings rate is ${savingsPercentage.toFixed(2)}%.`;
-        } else if (savingsPercentage > 30) {
-            emoji = "😐";
-            message = `Manage your expenses wisely. Your savings rate is ${savingsPercentage.toFixed(2)}%. You can still save more!`;
-        } else {
-            emoji = "😞";
-            message = `You need to save more. Your savings rate is ${savingsPercentage.toFixed(2)}%. Try reducing unnecessary expenses.`;
+    searchInput.addEventListener("input", () => {
+        displayTransactions(searchInput.value);
+    });
+
+    downloadCsvBtn.addEventListener("click", () => {
+        if (transactions.length === 0) {
+            alert("No transactions to download.");
+            return;
         }
 
-        statusEmoji.textContent = emoji;
-        statusMessage.textContent = message;
-    }
-
-    // Display feedbacks
-    function displayFeedbacks() {
-        feedbackSection.innerHTML = "";
-        feedbacks.forEach(feedback => {
-            const feedbackItem = document.createElement("div");
-            feedbackItem.classList.add("feedback-item");
-            feedbackItem.innerHTML = `
-                <p><strong>Rating:</strong> ${feedback.rating}</p>
-                <p><strong>Comment:</strong> ${feedback.comment}</p>
-            `;
-            feedbackSection.appendChild(feedbackItem);
+        let csvContent = "Description,Amount,Type,Category\n";
+        transactions.forEach(txn => {
+            csvContent += `"${txn.description}",${txn.amount},"${txn.type}","${txn.category}"\n`;
         });
-    }
 
-    updateUI();
-    displayFeedbacks();
+        const blob = new Blob([csvContent], { type: "text/csv" });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "transactions.csv";
+        link.click();
+    });
 });
