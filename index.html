@@ -5,65 +5,53 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Personal Finance Management</title>
     <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-    <h1>Personal Finance Management</h1>
-    <p>Track your spending, income, savings, and transactions.</p>
+    <div class="container">
+        <h1>💰 Personal Finance Management 💰</h1>
 
-    <div id="summary">
-        <p>Total Income: 💰 <span id="total-income">0</span></p>
-        <p>Total Expenses: 💸 <span id="total-expenses">0</span></p>
-        <p>Balance Left: 🏢 <span id="balance-left">0</span></p>
+        <div class="section" id="summary">
+            <h2>Financial Overview</h2>
+            <p class="bold">Total Income: <span id="total-income">💰 0.00</span></p>
+            <p class="bold">Total Expenses: <span id="total-expenses">💸 0.00</span></p>
+            <p class="bold">Balance Left: <span id="balance-left">🏦 0.00</span></p>
+            <p class="bold">Balance Left (%): <span id="balance-percent">0%</span></p>
+            <p class="bold">Spending (%): <span id="spending-percent">0%</span></p>
+            <p id="status-icon">ℹ️</p>
+            <p id="status-message">You're in great financial shape!</p>
+        </div>
+
+        <div class="section">
+            <h2>Transaction List 💳</h2>
+            <input type="text" id="search" placeholder="Search transactions...">
+            <select id="filter-transactions">
+                <option value="all">All</option>
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+            <ul id="transaction-list"></ul>
+            <input type="text" id="description" placeholder="Description">
+            <input type="number" id="amount" placeholder="Amount">
+            <select id="category">
+                <option value="food">Food</option>
+                <option value="transport">Transport</option>
+                <option value="other">Other</option>
+            </select>
+            <select id="type">
+                <option value="Income">Income</option>
+                <option value="Expense">Expense</option>
+            </select>
+            <button id="add-transaction">Add Transaction</button>
+            <button id="download-csv">Download CSV</button>
+        </div>
+
+        <div class="section" id="feedback-section">
+            <h2>Give Your Feedback</h2>
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSfbbSlY3DECGQpBuFVP0MhOHII9oOyty_kx42Lr9S9yMhPn5Q/viewform?embedded=true" height="500" frameborder="0">Loading…</iframe>
+        </div>
     </div>
-
-    <h2>Transaction List 📃</h2>
-    <input type="text" id="search" placeholder="Search transactions...">
-
-    <div class="filter-buttons">
-        <button data-filter="daily">Daily</button>
-        <button data-filter="weekly">Weekly</button>
-        <button data-filter="monthly">Monthly</button>
-    </div>
-
-    <ul id="transaction-list"></ul>
-
-    <input type="text" id="description" placeholder="Description">
-    <input type="number" id="amount" placeholder="Amount">
-    <select id="category">
-        <option value="salary">Salary 💼</option>
-        <option value="rent">Rent 🏠</option>
-        <option value="food">Food 🍔</option>
-        <option value="entertainment">Entertainment 🎬</option>
-        <option value="transport">Transport 🚗</option>
-        <option value="others">Others 🔄</option>
-    </select>
-    <select id="type">
-        <option value="Income">Income 💰</option>
-        <option value="Expense">Expense 💸</option>
-    </select>
-    <button id="add-transaction">Add Transaction</button>
-
-    <h2>Financial Status 😊😐😞</h2>
-    <div id="emoji-status">😐</div>
-    <p id="status-message">Your financial health based on the balance percentage.</p>
-
-    <h2>Give Your Feedback</h2>
-    <form id="feedback-form">
-        <label for="rating">Rating:</label>
-        <input type="radio" name="rating" value="5" id="rating-5"> 5
-        <input type="radio" name="rating" value="4" id="rating-4"> 4
-        <input type="radio" name="rating" value="3" id="rating-3"> 3
-        <input type="radio" name="rating" value="2" id="rating-2"> 2
-        <input type="radio" name="rating" value="1" id="rating-1"> 1
-
-        <label for="feedback-comment">Comment:</label>
-        <textarea id="feedback-comment" placeholder="Leave your comment here..."></textarea>
-
-        <button type="button" id="submit-feedback">Submit Feedback</button>
-    </form>
-
-    <h2>Feedbacks</h2>
-    <div id="feedback-section"></div>
 
     <script src="script.js"></script>
 </body>
