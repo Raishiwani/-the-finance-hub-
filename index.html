@@ -11,6 +11,13 @@
     <div class="container">
         <h1>💰 Personal Finance Management 💰</h1>
 
+        <div class="section" id="budget-section">
+            <h2>Set Your Budget</h2>
+            <input type="number" id="budget-input" placeholder="Enter your budget">
+            <button id="set-budget">Set Budget</button>
+            <p class="bold">Budget: <span id="budget-amount">💰 0.00</span></p>
+        </div>
+
         <div class="section" id="summary">
             <h2>Financial Overview</h2>
             <p class="bold">Total Income: <span id="total-income">💰 0.00</span></p>
@@ -25,19 +32,19 @@
         <div class="section">
             <h2>Transaction List 💳</h2>
             <input type="text" id="search" placeholder="Search transactions...">
-            <select id="filter-transactions">
-                <option value="all">All</option>
-                <option value="daily">Daily</option>
-                <option value="weekly">Weekly</option>
-                <option value="monthly">Monthly</option>
-            </select>
             <ul id="transaction-list"></ul>
             <input type="text" id="description" placeholder="Description">
             <input type="number" id="amount" placeholder="Amount">
             <select id="category">
-                <option value="food">Food</option>
-                <option value="transport">Transport</option>
-                <option value="other">Other</option>
+                <option value="food">🍔 Food</option>
+                <option value="transport">🚗 Transport</option>
+                <option value="entertainment">🎬 Entertainment</option>
+                <option value="health">🏥 Health</option>
+                <option value="shopping">🛍️ Shopping</option>
+                <option value="education">📚 Education</option>
+                <option value="salary">💰 Salary</option>
+                <option value="investment">📈 Investment</option>
+                <option value="other">🔹 Other</option>
             </select>
             <select id="type">
                 <option value="Income">Income</option>
